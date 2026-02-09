@@ -51,20 +51,13 @@ Each check is marked as:
 
 ## 🧑‍💻 Installation & Setup
 
-### 1️⃣ Clone the Repository
-
-```bash
-git clone <repository-url>
-cd docker-image-security-auditor
-```
-
-### 2️⃣ Install Dependencies
+### 1️⃣ Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 3️⃣ Run the Application
+### 2️⃣ Run the Application
 
 ```bash
 streamlit run app.py
