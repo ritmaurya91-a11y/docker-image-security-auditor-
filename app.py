@@ -1,74 +1,93 @@
 import streamlit as st
 
 # ---------- Page Setup ----------
-st.set_page_config(
-    page_title="Docker Image Security Auditor",
-    layout="wide"
-)
+st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
 
-# ---------- FORCE WHITE TEXT ----------
+# ---------- Custom Styling ----------
 st.markdown("""
 <style>
 
-/* Make all text white */
-html, body, [class*="css"] {
-    color: #ffffff !important;
-}
-
-/* Headings */
-h1, h2, h3, h4, h5, h6 {
-    color: #ffffff !important;
-}
-
-/* Paragraphs and labels */
-p, label, span, div {
-    color: #ffffff !important;
-}
-
-/* Fix file uploader */
-[data-testid="stFileUploader"] {
-    color: #ffffff !important;
-}
-
-/* Remove unwanted top black line */
+/* Remove Streamlit default header/footer */
 header {visibility: hidden;}
 footer {visibility: hidden;}
+#MainMenu {visibility: hidden;}
+
+.block-container {
+    padding-top: 1rem;
+}
+
+/* Background with smooth dark overlay */
+.stApp {
+    background:
+    linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)),
+    url("https://images.unsplash.com/photo-1518770660439-4636190af475");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Glass effect container */
+.glass {
+    background: rgba(20, 20, 20, 0.75);
+    padding: 40px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 0 30px rgba(0,255,255,0.2);
+}
+
+/* Title styling */
+.title {
+    font-size: 48px;
+    font-weight: 800;
+    text-align: center;
+    color: #00ffff;
+    text-shadow: 2px 2px 10px black;
+}
+
+/* Subtitle styling */
+.subtitle {
+    text-align: center;
+    font-size: 20px;
+    color: white;
+    margin-bottom: 30px;
+}
 
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- Title ----------
-st.title("🐳 Docker Image Security Auditor Dashboard")
-st.write("Upload a Dockerfile to perform automated security audit analysis.")
+# ---------- Header ----------
+st.markdown('<div class="title">🐳 Docker Image Security Auditor</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Automated Dockerfile Static Security Scanner Dashboard</div>', unsafe_allow_html=True)
 
-# ---------- Upload Dockerfile ----------
+st.markdown('<div class="glass">', unsafe_allow_html=True)
+
+# ---------- Upload ----------
 uploaded_file = st.file_uploader("📤 Upload Dockerfile", type=["txt", "Dockerfile"])
 
 dockerfile_content = ""
 
 if uploaded_file is not None:
     dockerfile_content = uploaded_file.read().decode("utf-8")
-
     st.subheader("📄 Uploaded Dockerfile")
     st.code(dockerfile_content, language="dockerfile")
 
-# ---------- Risk Description Dictionary ----------
+# ---------- Risk Description ----------
 risk_description = {
-    "Base image defined": "Missing base image makes Dockerfile invalid and insecure.",
-    "Avoid using latest tag": "Using latest tag can introduce unknown vulnerabilities.",
+    "Base image defined": "Dockerfile must define a secure base image.",
+    "Avoid using latest tag": "Using latest tag may introduce unknown vulnerabilities.",
     "Non-root user configured": "Running container as root increases attack impact.",
-    "Healthcheck present": "Without healthcheck, container failure may go undetected.",
-    "COPY preferred over ADD": "ADD can unintentionally pull external or unwanted files.",
-    "Port exposure limited": "Exposing ports increases external attack surface.",
-    "Startup command defined": "Missing CMD or ENTRYPOINT can break container runtime.",
-    "Secrets in ENV": "Secrets stored in ENV can be extracted from image layers.",
-    "RUN layers optimized": "Too many RUN layers increase attack surface and image size.",
-    "APT cache cleaned": "Uncleaned cache may contain outdated vulnerable packages."
+    "Healthcheck present": "Healthcheck ensures container reliability.",
+    "COPY preferred over ADD": "ADD may introduce unintended files.",
+    "Port exposure limited": "Exposed ports increase attack surface.",
+    "Startup command defined": "Container must define CMD or ENTRYPOINT.",
+    "Secrets in ENV": "Secrets in ENV can leak sensitive data.",
+    "RUN layers optimized": "Too many RUN layers increase image size.",
+    "APT cache cleaned": "APT cache must be cleaned to avoid vulnerabilities."
 }
 
 # ---------- Audit Function ----------
 def audit_dockerfile(dockerfile):
-    results = [
+    return [
         ("Base image defined", "PASS" if "FROM" in dockerfile else "CRITICAL"),
         ("Avoid using latest tag", "PASS" if ":latest" not in dockerfile else "WARNING"),
         ("Non-root user configured", "PASS" if "USER root" not in dockerfile else "CRITICAL"),
@@ -80,9 +99,8 @@ def audit_dockerfile(dockerfile):
         ("RUN layers optimized", "PASS" if dockerfile.count("RUN") <= 5 else "WARNING"),
         ("APT cache cleaned", "PASS" if "rm -rf /var/lib/apt/lists" in dockerfile else "CRITICAL"),
     ]
-    return results
 
-# ---------- Scan Button ----------
+# ---------- Scan ----------
 if st.button("🔍 Scan Dockerfile"):
 
     if dockerfile_content.strip() == "":
@@ -111,7 +129,6 @@ if st.button("🔍 Scan Dockerfile"):
         st.subheader("📋 Detailed Security Findings")
 
         for check, status in results:
-
             if status == "PASS":
                 st.success(f"🟢 {check} → Secure configuration detected")
 
@@ -128,4 +145,6 @@ if st.button("🔍 Scan Dockerfile"):
                 )
 
         st.divider()
-        st.caption("Docker Image Security Auditor Report")
+        st.caption("Docker Image Security Auditor | Secure Your Containers")
+
+st.markdown('</div>', unsafe_allow_html=True)
