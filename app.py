@@ -13,12 +13,6 @@ st.markdown("""
     background-attachment: fixed;
 }
 
-.main-container {
-    background: rgba(0, 0, 0, 0.80);
-    padding: 40px;
-    border-radius: 15px;
-}
-
 .title-style {
     font-size: 45px;
     font-weight: bold;
