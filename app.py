@@ -3,58 +3,52 @@ import streamlit as st
 # ---------- Page Setup ----------
 st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
 
-# ---------- Theme Selector ----------
-theme_choice = st.sidebar.selectbox(
-    "🎨 Select Theme",
-    ["Dark Cyber", "Professional Light"]
-)
+# ---------- Background + Glass Theme ----------
+st.markdown("""
+<style>
+.stApp {
+    background-image: url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
 
-# ---------- Theme Styling ----------
-if theme_choice == "Dark Cyber":
-    st.markdown("""
-    <style>
-    html, body, [class*="css"]  {
-        background-color: #0e1117;
-        color: #ffffff;
-    }
-    .main-title {
-        font-size: 42px;
-        font-weight: bold;
-        color: #00d4ff;
-        text-align: center;
-    }
-    .risk-box-low {background-color:#0f2e1c;padding:15px;border-radius:10px;border-left:6px solid #00ff88;}
-    .risk-box-medium {background-color:#3a350d;padding:15px;border-radius:10px;border-left:6px solid #ffd000;}
-    .risk-box-high {background-color:#3a0d0d;padding:15px;border-radius:10px;border-left:6px solid #ff4b4b;}
-    </style>
-    """, unsafe_allow_html=True)
+.main-container {
+    background: rgba(0, 0, 0, 0.80);
+    padding: 40px;
+    border-radius: 15px;
+}
 
-else:
-    st.markdown("""
-    <style>
-    html, body, [class*="css"]  {
-        background-color: #f4f6f9;
-        color: #000000;
-    }
-    .main-title {
-        font-size: 42px;
-        font-weight: bold;
-        color: #003366;
-        text-align: center;
-    }
-    .risk-box-low {background-color:#d4edda;padding:15px;border-radius:10px;border-left:6px solid #28a745;}
-    .risk-box-medium {background-color:#fff3cd;padding:15px;border-radius:10px;border-left:6px solid #ffc107;}
-    .risk-box-high {background-color:#f8d7da;padding:15px;border-radius:10px;border-left:6px solid #dc3545;}
-    </style>
-    """, unsafe_allow_html=True)
+.title-style {
+    font-size: 45px;
+    font-weight: bold;
+    text-align: center;
+    color: #00d4ff;
+}
+
+.subtitle-style {
+    text-align: center;
+    font-size: 18px;
+    color: #dddddd;
+    margin-bottom: 20px;
+}
+
+.footer-text {
+    text-align: center;
+    color: #aaaaaa;
+    margin-top: 40px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# ---------- Start Glass Container ----------
+st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
 # ---------- Header ----------
-st.markdown('<div class="main-title">🐳 Docker Image Security Auditor Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="title-style">🐳 Docker Image Security Auditor</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle-style">Automated Dockerfile Static Security Scanner Dashboard</div>', unsafe_allow_html=True)
 
-# ---------- Security Image ----------
-st.image("https://cdn-icons-png.flaticon.com/512/3064/3064197.png", width=120)
-
-st.write("Upload a Dockerfile to perform automated security audit analysis.")
 st.divider()
 
 # ---------- Upload Dockerfile ----------
@@ -116,11 +110,11 @@ if st.button("🔍 Scan Dockerfile"):
         st.progress(risk_percent / 100)
 
         if risk_percent < 30:
-            st.markdown('<div class="risk-box-low">🟢 LOW RISK – Secure configuration detected.</div>', unsafe_allow_html=True)
+            st.success("🟢 LOW RISK – Dockerfile follows good security practices.")
         elif risk_percent < 60:
-            st.markdown('<div class="risk-box-medium">🟡 MEDIUM RISK – Improvements recommended.</div>', unsafe_allow_html=True)
+            st.warning("🟡 MEDIUM RISK – Some improvements recommended.")
         else:
-            st.markdown('<div class="risk-box-high">🔴 HIGH RISK – Critical misconfigurations detected.</div>', unsafe_allow_html=True)
+            st.error("🔴 HIGH RISK – Critical misconfigurations detected.")
 
         st.divider()
 
@@ -138,4 +132,8 @@ if st.button("🔍 Scan Dockerfile"):
                 st.error(f"🔴 {check}\n\n👉 {risk_description.get(check)}")
 
         st.divider()
-        st.caption("Docker Image Security Auditor • DevSecOps Static Analysis Tool")
+
+        st.markdown('<div class="footer-text">Docker Image Security Auditor • DevSecOps Static Analysis Tool • Internship Project</div>', unsafe_allow_html=True)
+
+# ---------- End Glass Container ----------
+st.markdown('</div>', unsafe_allow_html=True)
