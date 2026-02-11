@@ -3,66 +3,77 @@ import streamlit as st
 # ---------- Page Setup ----------
 st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
 
-# ---------- Background + Glass Theme ----------
+# ---------- Stylish Background ----------
 st.markdown("""
 <style>
+
 .stApp {
-    background-image: url("https://images.unsplash.com/photo-1550751827-4bd374c3f58b");
+    background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
+    url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-.main-container {
-    background: rgba(0, 0, 0, 0.80);
+/* Remove top extra spacing */
+.block-container {
+    padding-top: 2rem;
+}
+
+/* Glass container */
+.glass {
+    background: rgba(20, 20, 20, 0.85);
     padding: 40px;
-    border-radius: 15px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
 }
 
-.title-style {
-    font-size: 45px;
-    font-weight: bold;
+/* Title */
+.title {
+    font-size: 48px;
+    font-weight: 700;
     text-align: center;
-    color: #00d4ff;
+    color: #00e5ff;
 }
 
-.subtitle-style {
+/* Subtitle */
+.subtitle {
     text-align: center;
-    font-size: 18px;
-    color: #dddddd;
-    margin-bottom: 20px;
+    font-size: 20px;
+    color: #ffffff;
+    margin-bottom: 30px;
 }
 
-.footer-text {
+/* Footer */
+.footer {
     text-align: center;
-    color: #aaaaaa;
+    color: #cccccc;
     margin-top: 40px;
+    font-size: 14px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- Start Glass Container ----------
-st.markdown('<div class="main-container">', unsafe_allow_html=True)
+# ---------- Glass Container Start ----------
+st.markdown('<div class="glass">', unsafe_allow_html=True)
 
-# ---------- Header ----------
-st.markdown('<div class="title-style">🐳 Docker Image Security Auditor</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle-style">Automated Dockerfile Static Security Scanner Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="title">🐳 Docker Image Security Auditor</div>', unsafe_allow_html=True)
+st.markdown('<div class="subtitle">Automated Dockerfile Static Security Scanner Dashboard</div>', unsafe_allow_html=True)
 
 st.divider()
 
-# ---------- Upload Dockerfile ----------
+# ---------- Upload ----------
 uploaded_file = st.file_uploader("📤 Upload Dockerfile", type=["txt", "Dockerfile"])
 
 dockerfile_content = ""
 
-if uploaded_file is not None:
+if uploaded_file:
     dockerfile_content = uploaded_file.read().decode("utf-8")
-
     st.subheader("📄 Uploaded Dockerfile")
     st.code(dockerfile_content, language="dockerfile")
 
-# ---------- Risk Description Dictionary ----------
+# ---------- Risk Dictionary ----------
 risk_description = {
     "Base image defined": "Missing base image makes Dockerfile invalid and insecure.",
     "Avoid using latest tag": "Using latest tag can introduce unknown vulnerabilities.",
@@ -72,13 +83,13 @@ risk_description = {
     "Port exposure limited": "Exposing ports increases external attack surface.",
     "Startup command defined": "Missing CMD or ENTRYPOINT can break container runtime.",
     "Secrets in ENV": "Secrets stored in ENV can be extracted from image layers.",
-    "RUN layers optimized": "Too many RUN layers increase attack surface and image size.",
+    "RUN layers optimized": "Too many RUN layers increase attack surface.",
     "APT cache cleaned": "Uncleaned cache may contain outdated vulnerable packages."
 }
 
 # ---------- Audit Function ----------
 def audit_dockerfile(dockerfile):
-    results = [
+    return [
         ("Base image defined", "PASS" if "FROM" in dockerfile else "CRITICAL"),
         ("Avoid using latest tag", "PASS" if ":latest" not in dockerfile else "WARNING"),
         ("Non-root user configured", "PASS" if "USER root" not in dockerfile else "CRITICAL"),
@@ -90,50 +101,41 @@ def audit_dockerfile(dockerfile):
         ("RUN layers optimized", "PASS" if dockerfile.count("RUN") <= 5 else "WARNING"),
         ("APT cache cleaned", "PASS" if "rm -rf /var/lib/apt/lists" in dockerfile else "CRITICAL"),
     ]
-    return results
 
-# ---------- Scan Button ----------
+# ---------- Scan ----------
 if st.button("🔍 Scan Dockerfile"):
 
-    if dockerfile_content.strip() == "":
+    if not dockerfile_content.strip():
         st.warning("⚠ Please upload Dockerfile first")
     else:
-        st.subheader("📊 One Page Security Audit Report")
-
         results = audit_dockerfile(dockerfile_content)
 
         score_map = {"PASS": 0, "WARNING": 5, "CRITICAL": 10}
-        risk_score = sum(score_map[s] for _, s in results)
-        risk_percent = min(100, risk_score)
+        risk_percent = min(100, sum(score_map[s] for _, s in results))
 
-        st.markdown(f"### 🔐 Overall Risk Level: **{risk_percent}%**")
+        st.subheader("📊 Security Risk Overview")
+        st.markdown(f"### 🔐 Overall Risk Score: {risk_percent}%")
         st.progress(risk_percent / 100)
 
         if risk_percent < 30:
-            st.success("🟢 LOW RISK – Dockerfile follows good security practices.")
+            st.success("🟢 LOW RISK – Secure configuration detected.")
         elif risk_percent < 60:
-            st.warning("🟡 MEDIUM RISK – Some improvements recommended.")
+            st.warning("🟡 MEDIUM RISK – Improvements recommended.")
         else:
-            st.error("🔴 HIGH RISK – Critical misconfigurations detected.")
+            st.error("🔴 HIGH RISK – Critical misconfigurations found.")
 
         st.divider()
-
-        st.subheader("📋 Detailed Security Findings")
+        st.subheader("📋 Detailed Findings")
 
         for check, status in results:
-
             if status == "PASS":
-                st.success(f"🟢 {check} → Secure configuration detected")
-
+                st.success(f"🟢 {check}")
             elif status == "WARNING":
-                st.warning(f"🟡 {check}\n\n👉 {risk_description.get(check)}")
-
+                st.warning(f"🟡 {check}\n\n👉 {risk_description[check]}")
             else:
-                st.error(f"🔴 {check}\n\n👉 {risk_description.get(check)}")
+                st.error(f"🔴 {check}\n\n👉 {risk_description[check]}")
 
-        st.divider()
+        st.markdown('<div class="footer">Docker Image Security Auditor • DevSecOps Tool • Internship Project</div>', unsafe_allow_html=True)
 
-        st.markdown('<div class="footer-text">Docker Image Security Auditor • DevSecOps Static Analysis Tool • Internship Project</div>', unsafe_allow_html=True)
-
-# ---------- End Glass Container ----------
+# ---------- Glass End ----------
 st.markdown('</div>', unsafe_allow_html=True)
