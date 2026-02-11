@@ -9,7 +9,7 @@ st.markdown("""
 
 .stApp {
     background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)),
-    url("https://images.unsplash.com/photo-1518770660439-4636190af475");
+    url("https://tse1.mm.bing.net/th/id/OIP.4T-r3LI73NNGg_E-gg5ygwHaEJ?pid=Api&P=0&h=180");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
