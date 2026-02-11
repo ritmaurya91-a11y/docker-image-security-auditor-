@@ -3,8 +3,62 @@ import streamlit as st
 # ---------- Page Setup ----------
 st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
 
-st.title("🐳 Docker Image Security Auditor Dashboard")
-st.write("Upload a Dockerfile to perform automated security audit analysis.")
+# ---------- Dark Theme Styling ----------
+st.markdown("""
+<style>
+html, body, [class*="css"]  {
+    background-color: #0e1117;
+    color: #ffffff;
+}
+
+.main-title {
+    font-size: 42px;
+    font-weight: bold;
+    color: #00d4ff;
+    text-align: center;
+}
+
+.sub-text {
+    text-align: center;
+    font-size: 18px;
+    color: #aaaaaa;
+}
+
+.audit-box {
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+.low-risk {
+    background-color: #0f2e1c;
+    border-left: 6px solid #00ff88;
+}
+
+.medium-risk {
+    background-color: #3a350d;
+    border-left: 6px solid #ffd000;
+}
+
+.high-risk {
+    background-color: #3a0d0d;
+    border-left: 6px solid #ff4b4b;
+}
+
+.footer-text {
+    text-align: center;
+    color: #888888;
+    font-size: 14px;
+    margin-top: 40px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# ---------- Header ----------
+st.markdown('<div class="main-title">🐳 Docker Image Security Auditor Dashboard</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-text">Upload a Dockerfile to perform automated security audit analysis.</div>', unsafe_allow_html=True)
+st.divider()
 
 # ---------- Upload Dockerfile ----------
 uploaded_file = st.file_uploader("📤 Upload Dockerfile", type=["txt", "Dockerfile"])
@@ -65,16 +119,19 @@ if st.button("🔍 Scan Dockerfile"):
         st.markdown(f"### 🔐 Overall Risk Level: **{risk_percent}%**")
         st.progress(risk_percent / 100)
 
+        # ---------- Styled Risk Box ----------
         if risk_percent < 30:
-            st.success("🟢 LOW RISK")
+            st.markdown('<div class="audit-box low-risk">🟢 LOW RISK – Dockerfile follows good security practices.</div>', unsafe_allow_html=True)
+
         elif risk_percent < 60:
-            st.warning("🟡 MEDIUM RISK")
+            st.markdown('<div class="audit-box medium-risk">🟡 MEDIUM RISK – Some improvements recommended before deployment.</div>', unsafe_allow_html=True)
+
         else:
-            st.error("🔴 HIGH RISK")
+            st.markdown('<div class="audit-box high-risk">🔴 HIGH RISK – Critical misconfigurations detected. Fix before production use.</div>', unsafe_allow_html=True)
 
         st.divider()
 
-        # ---------- Detailed 10-Line Report ----------
+        # ---------- Detailed Report ----------
         st.subheader("📋 Detailed Security Findings")
 
         for check, status in results:
@@ -95,4 +152,6 @@ if st.button("🔍 Scan Dockerfile"):
                 )
 
         st.divider()
-        st.caption("Docker Image Security Auditor Report")
+
+        # ---------- Footer ----------
+        st.markdown('<div class="footer-text">Docker Image Security Auditor • DevSecOps Static Analysis Tool • Internship Project</div>', unsafe_allow_html=True)
