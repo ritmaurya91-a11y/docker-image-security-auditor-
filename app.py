@@ -20,13 +20,6 @@ st.markdown("""
     padding-top: 2rem;
 }
 
-/* Glass container */
-.glass {
-    background: rgba(20, 20, 20, 0.85);
-    padding: 40px;
-    border-radius: 20px;
-    backdrop-filter: blur(8px);
-}
 
 /* Title */
 .title {
@@ -55,8 +48,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ---------- Glass Container Start ----------
-st.markdown('<div class="glass">', unsafe_allow_html=True)
 
 st.markdown('<div class="title">🐳 Docker Image Security Auditor</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle">Automated Dockerfile Static Security Scanner Dashboard</div>', unsafe_allow_html=True)
