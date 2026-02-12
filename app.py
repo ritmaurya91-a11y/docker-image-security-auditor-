@@ -7,49 +7,82 @@ st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
 st.markdown("""
 <style>
 
-/* Remove Streamlit default header/footer */
-header {visibility: hidden;}
-footer {visibility: hidden;}
-#MainMenu {visibility: hidden;}
+/* Hide Streamlit default UI */
+header, footer, #MainMenu {visibility: hidden;}
 
 .block-container {
-    padding-top: 1rem;
+    padding-top: 1.5rem;
 }
 
-/* Background with smooth dark overlay */
+/* Strong dark overlay background */
 .stApp {
     background:
-    linear-gradient(to bottom, rgba(0,0,0,0.4), rgba(0,0,0,0.8)),
+    linear-gradient(to bottom, rgba(0,0,0,0.75), rgba(0,0,0,0.9)),
     url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* Glass effect container */
+/* Glass container */
 .glass {
-    background: rgba(20, 20, 20, 0.75);
+    background: rgba(15, 15, 15, 0.88);
     padding: 40px;
     border-radius: 20px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 0 30px rgba(0,255,255,0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 35px rgba(0,255,255,0.25);
+    color: #ffffff;
 }
 
-/* Title styling */
+/* Title */
 .title {
-    font-size: 48px;
-    font-weight: 800;
+    font-size: 50px;
+    font-weight: 900;
     text-align: center;
     color: #00ffff;
-    text-shadow: 2px 2px 10px black;
+    text-shadow: 0 0 12px rgba(0,255,255,0.8);
 }
 
-/* Subtitle styling */
+/* Subtitle */
 .subtitle {
     text-align: center;
     font-size: 20px;
-    color: white;
-    margin-bottom: 30px;
+    color: #e0e0e0;
+    margin-bottom: 35px;
+}
+
+/* Section headers */
+h2, h3, h4 {
+    color: #ffffff !important;
+    text-shadow: 1px 1px 6px black;
+}
+
+/* Code block */
+pre {
+    background: #0d1117 !important;
+    color: #ffffff !important;
+    border-radius: 12px;
+}
+
+/* Alerts contrast */
+.stSuccess {
+    background-color: rgba(0, 150, 0, 0.25) !important;
+    color: #eaffea !important;
+}
+
+.stWarning {
+    background-color: rgba(255, 165, 0, 0.25) !important;
+    color: #fff4d6 !important;
+}
+
+.stError {
+    background-color: rgba(255, 0, 0, 0.25) !important;
+    color: #ffe6e6 !important;
+}
+
+/* Progress bar */
+.stProgress > div > div {
+    background-color: #00ffff !important;
 }
 
 </style>
@@ -125,7 +158,6 @@ if st.button("🔍 Scan Dockerfile"):
             st.error("🔴 HIGH RISK")
 
         st.divider()
-
         st.subheader("📋 Detailed Security Findings")
 
         for check, status in results:
@@ -134,14 +166,12 @@ if st.button("🔍 Scan Dockerfile"):
 
             elif status == "WARNING":
                 st.warning(
-                    f"🟡 {check}\n\n"
-                    f"👉 {risk_description.get(check)}"
+                    f"🟡 {check}\n\n👉 {risk_description.get(check)}"
                 )
 
             else:
                 st.error(
-                    f"🔴 {check}\n\n"
-                    f"👉 {risk_description.get(check)}"
+                    f"🔴 {check}\n\n👉 {risk_description.get(check)}"
                 )
 
         st.divider()
