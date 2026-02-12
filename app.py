@@ -25,14 +25,6 @@ header, footer, #MainMenu {visibility: hidden;}
 }
 
 /* Glass container */
-.glass {
-    background: rgba(15, 15, 15, 0.88);
-    padding: 40px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 0 35px rgba(0,255,255,0.25);
-    color: #ffffff;
-}
 
 /* Title */
 .title {
