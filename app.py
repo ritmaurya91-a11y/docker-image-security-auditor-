@@ -118,7 +118,7 @@ if st.button("🔍 Scan Dockerfile"):
     if dockerfile_content.strip() == "":
         st.warning("⚠ Please upload Dockerfile first")
     else:
-        st.subheader("📊 One Page Security Audit Report")
+        st.subheader("📊 Security Audit Report")
 
         results = audit_dockerfile(dockerfile_content)
 
