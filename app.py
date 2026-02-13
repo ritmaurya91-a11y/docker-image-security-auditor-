@@ -1,5 +1,4 @@
 import streamlit as st
-import matplotlib.pyplot as plt
 
 # ---------- Page Setup ----------
 st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
