@@ -15,7 +15,7 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 st.markdown("""
 <style>
 
-/* Hide default Streamlit menu */
+/* Hide default menu */
 #MainMenu, header, footer {visibility: hidden;}
 
 /* Background */
@@ -28,88 +28,59 @@ st.markdown("""
     background-attachment: fixed;
 }
 
-/* Force ALL text solid white */
+/* Force all text white */
 html, body, p, span, div, li, ul, ol,
-h1, h2, h3, h4, h5, h6,
-label, strong, em,
-[data-testid="stMarkdownContainer"] {
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
+}
+
+/* ==============================
+   ULTRA FIX FOR DROPZONE TEXT
+============================== */
+
+/* Target entire uploader */
+div[data-testid="stFileUploader"] * {
     color: #ffffff !important;
     opacity: 1 !important;
 }
 
-/* ==============================
-   FIX DRAG & DROP TEXT
-============================== */
+/* Target dropzone specifically */
+div[data-testid="stFileUploaderDropzone"] * {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    font-weight: 600 !important;
+}
+
+/* Add stylish border */
 div[data-testid="stFileUploaderDropzone"] {
     background: rgba(20,20,20,0.95) !important;
     border: 2px dashed #00ffff !important;
     border-radius: 18px !important;
-    padding: 45px !important;
-    animation: glow 2s infinite;
+    padding: 50px !important;
     transition: 0.3s ease;
 }
 
+/* Hover glow */
 div[data-testid="stFileUploaderDropzone"]:hover {
-    transform: scale(1.02);
     border-color: #00ff99 !important;
+    box-shadow: 0 0 25px #00ff99;
+    transform: scale(1.02);
 }
 
-/* Main drag text */
-div[data-testid="stFileUploaderDropzone"] span {
-    color: #ffffff !important;
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    opacity: 1 !important;
-}
-
-/* Sub text (limit file size) */
-div[data-testid="stFileUploaderDropzone"] small {
-    color: #ffffff !important;
-    font-size: 14px !important;
-    opacity: 1 !important;
-}
-
-/* Glow animation */
-@keyframes glow {
-    0% { box-shadow: 0 0 5px #00ffff; }
-    50% { box-shadow: 0 0 25px #00ff99; }
-    100% { box-shadow: 0 0 5px #00ffff; }
-}
-
-/* Button pulse animation */
-@keyframes pulse {
-    0% { box-shadow: 0 0 5px #00ffff; }
-    50% { box-shadow: 0 0 25px #00ff99; }
-    100% { box-shadow: 0 0 5px #00ffff; }
-}
-
+/* Button styling */
 .stButton > button {
     background: linear-gradient(90deg, #00ffff, #00ff99) !important;
     color: black !important;
     font-weight: bold !important;
     border-radius: 12px !important;
     padding: 10px 25px !important;
-    animation: pulse 2s infinite;
-    transition: 0.3s ease;
 }
 
-.stButton > button:hover {
-    transform: scale(1.05);
-}
-
-/* Code block */
+/* Code blocks */
 pre {
     background: #0d1117 !important;
     color: white !important;
     border-radius: 12px;
-}
-
-/* Inline code */
-code {
-    background: #1f2937 !important;
-    color: #00ff99 !important;
-    padding: 3px 6px;
-    border-radius: 6px;
 }
 
 </style>
