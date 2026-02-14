@@ -33,12 +33,12 @@ header, footer, #MainMenu {visibility: hidden;}
 .subtitle {
     text-align: center;
     font-size: 20px;
-    color: #e0e0e0;
+    color: #ffffff;
     margin-bottom: 35px;
 }
 
-h2, h3, h4 {
-    color: #ffffff !important;
+h2, h3, h4, p, span, div {
+    color: white !important;
 }
 
 pre {
@@ -76,7 +76,7 @@ def audit_dockerfile(dockerfile):
     return [
         ("Base image defined", "PASS" if "FROM" in dockerfile else "CRITICAL"),
         ("Avoid using latest tag", "PASS" if ":latest" not in dockerfile else "WARNING"),
-        ("Non-root user configured", "PASS" if "USER root" not in dockerfile else "CRITICAL"),
+        ("Running as non-root user", "PASS" if "USER root" not in dockerfile else "CRITICAL"),
         ("Healthcheck present", "PASS" if "HEALTHCHECK" in dockerfile else "WARNING"),
         ("Secrets in ENV", "PASS" if "SECRET" not in dockerfile else "CRITICAL"),
     ]
@@ -84,18 +84,17 @@ def audit_dockerfile(dockerfile):
 # ---------- AI Analysis ----------
 def ai_security_analysis(dockerfile):
 
-    # Prevent very large prompt crash
     dockerfile = dockerfile[:4000]
 
     prompt = f"""
-You are a senior DevSecOps engineer.
+You are a Senior DevSecOps Engineer.
 
 Analyze this Dockerfile and provide:
 
-1. Security Risks (with severity: LOW/MEDIUM/HIGH)
-2. Configuration Errors
-3. Recommended Fix for each issue
-4. Separate explanation of each issue
+1. Overall Risk Percentage (0-100%)
+2. Security Risks (LOW/MEDIUM/HIGH)
+3. Short description of each risk
+4. Recommended Fix for each issue
 5. Best practice improvements
 
 Dockerfile:
@@ -104,7 +103,7 @@ Dockerfile:
 
     try:
         response = client.chat.completions.create(
-            model="llama3-70b-8192",
+            model="llama-3.3-70b-versatile",   # ✅ Updated working model
             messages=[
                 {"role": "system", "content": "You are a Docker security expert."},
                 {"role": "user", "content": prompt}
