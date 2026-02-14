@@ -3,53 +3,53 @@ from groq import Groq
 import time
 
 # ==============================
-# API KEY
+# CONFIG
 # ==============================
-client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-
 st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
 
+client = Groq(api_key=st.secrets["GROQ_API_KEY"])
+
 # ==============================
-# ANIMATED UI CSS
+# COMPLETE CSS (FULL VISIBILITY FIX)
 # ==============================
 st.markdown("""
 <style>
 
-/* Hide Streamlit menu */
+/* Hide default */
 #MainMenu, header, footer {visibility: hidden;}
 
 /* Background */
 .stApp {
     background:
-    linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.95)),
+    linear-gradient(rgba(0,0,0,0.90), rgba(0,0,0,0.95)),
     url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* Title */
-.title {
-    font-size: 50px;
-    font-weight: 900;
-    text-align: center;
-    color: #00ffff;
-    text-shadow: 0 0 15px #00ffff;
+/* FORCE ALL TEXT WHITE */
+html, body,
+p, span, div,
+h1, h2, h3, h4, h5, h6,
+li, ul, ol,
+label, strong, em,
+[data-testid="stMarkdownContainer"] {
+    color: #ffffff !important;
+    opacity: 1 !important;
 }
 
-.subtitle {
-    text-align: center;
-    font-size: 20px;
-    margin-bottom: 40px;
-    color: white;
+/* Headers color */
+h2, h3 {
+    color: #00ffff !important;
 }
 
 /* ==============================
-   UPLOAD BOX GLOW ANIMATION
+   GLOW ANIMATION
 ============================== */
 @keyframes glow {
     0% { box-shadow: 0 0 5px #00ffff; }
-    50% { box-shadow: 0 0 20px #00ff99; }
+    50% { box-shadow: 0 0 25px #00ff99; }
     100% { box-shadow: 0 0 5px #00ffff; }
 }
 
@@ -59,16 +59,16 @@ section[data-testid="stFileUploader"] {
     border-radius: 18px !important;
     border: 2px dashed #00ffff !important;
     animation: glow 2s infinite;
-    transition: all 0.3s ease;
+    transition: 0.3s ease;
 }
 
-/* Hover effect */
+/* Hover */
 section[data-testid="stFileUploader"]:hover {
     transform: scale(1.02);
     border-color: #00ff99 !important;
 }
 
-/* Drag text */
+/* Drag text style */
 section[data-testid="stFileUploader"] p {
     font-size: 18px !important;
     font-weight: 700 !important;
@@ -78,17 +78,7 @@ section[data-testid="stFileUploader"] p {
     text-align: center;
 }
 
-/* File limit line */
-section[data-testid="stFileUploader"] small {
-    font-size: 14px !important;
-    color: #cccccc !important;
-    text-align: center;
-    display: block;
-}
-
-/* ==============================
-   BUTTON ANIMATION
-============================== */
+/* Button animation */
 @keyframes pulse {
     0% { box-shadow: 0 0 5px #00ffff; }
     50% { box-shadow: 0 0 25px #00ff99; }
@@ -102,12 +92,11 @@ section[data-testid="stFileUploader"] small {
     border-radius: 12px !important;
     padding: 10px 25px !important;
     animation: pulse 2s infinite;
-    transition: all 0.3s ease;
+    transition: 0.3s ease;
 }
 
 .stButton > button:hover {
     transform: scale(1.05);
-    background: linear-gradient(90deg, #00ff99, #00ffff) !important;
 }
 
 /* Code block */
@@ -117,14 +106,22 @@ pre {
     border-radius: 12px;
 }
 
+/* Inline code */
+code {
+    background: #1f2937 !important;
+    color: #00ff99 !important;
+    padding: 3px 6px;
+    border-radius: 6px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================
 # HEADER
 # ==============================
-st.markdown('<div class="title">🐳 Docker Image Security Auditor</div>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Static + AI Powered Dockerfile Security Scanner</div>', unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;color:#00ffff;'>🐳 Docker Image Security Auditor</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center;'>Static + AI Powered Dockerfile Security Scanner</h4>", unsafe_allow_html=True)
 
 # ==============================
 # FILE UPLOAD
@@ -139,12 +136,12 @@ if uploaded_file:
     st.code(dockerfile_content, language="dockerfile")
 
 # ==============================
-# STATIC CHECK
+# STATIC SCAN
 # ==============================
 def static_scan(dockerfile):
     return [
         ("Base image defined", "PASS" if "FROM" in dockerfile else "CRITICAL"),
-        ("Avoid using latest tag", "WARNING" if ":latest" in dockerfile else "PASS"),
+        ("Avoid latest tag", "WARNING" if ":latest" in dockerfile else "PASS"),
         ("Running as root user", "CRITICAL" if "USER root" in dockerfile else "PASS"),
         ("Healthcheck present", "PASS" if "HEALTHCHECK" in dockerfile else "WARNING"),
     ]
@@ -159,10 +156,11 @@ def ai_analysis(dockerfile):
 You are a Senior DevSecOps Engineer.
 
 Analyze this Dockerfile and provide:
-- Overall Risk %
-- Security risks
-- Recommended fixes
-- Best practices
+1. Overall Risk Percentage
+2. Security Risks
+3. Explanation
+4. Recommended Fixes
+5. Best Practices
 
 Dockerfile:
 {dockerfile}
@@ -191,7 +189,7 @@ if st.button("🔍 Run Full Security Scan"):
         st.warning("⚠ Please upload a Dockerfile first.")
     else:
 
-        # SCANNING ANIMATION
+        # Scanning animation
         progress = st.progress(0)
         for i in range(100):
             time.sleep(0.01)
