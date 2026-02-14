@@ -15,77 +15,81 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 st.markdown("""
 <style>
 
-/* Hide default menu */
-#MainMenu, header, footer {visibility: hidden;}
-
-/* Background */
+/* Background stays */
 .stApp {
     background:
-    linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.96)),
+    linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.92)),
     url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* Force all text white */
-html, body, p, span, div, li, ul, ol,
-h1, h2, h3, h4, h5, h6 {
-    color: #ffffff !important;
-}
+/* ================================
+   ANIMATED DROPZONE DESIGN
+================================ */
 
-/* ==============================
-   ULTRA FIX FOR DROPZONE TEXT
-============================== */
-
-/* Target entire uploader */
-div[data-testid="stFileUploader"] * {
-    color: #ffffff !important;
-    opacity: 1 !important;
-}
-
-/* Target dropzone specifically */
-div[data-testid="stFileUploaderDropzone"] * {
-    color: #ffffff !important;
-    opacity: 1 !important;
-    font-weight: 600 !important;
-}
-
-/* Add stylish border */
 div[data-testid="stFileUploaderDropzone"] {
-    background: rgba(20,20,20,0.95) !important;
-    border: 2px dashed #00ffff !important;
-    border-radius: 18px !important;
+    background: rgba(25,25,25,0.95) !important;
+    border: 2px solid transparent !important;
+    border-radius: 20px !important;
     padding: 50px !important;
-    transition: 0.3s ease;
+    position: relative;
+    transition: all 0.3s ease-in-out;
+    animation: glowPulse 3s infinite alternate;
 }
 
-/* Hover glow */
+/* Gradient glowing border */
+div[data-testid="stFileUploaderDropzone"]::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    background: linear-gradient(45deg, #00ffff, #00ff99, #00ffff);
+    z-index: -1;
+    filter: blur(12px);
+    opacity: 0.6;
+}
+
+/* Hover animation */
 div[data-testid="stFileUploaderDropzone"]:hover {
-    border-color: #00ff99 !important;
-    box-shadow: 0 0 25px #00ff99;
     transform: scale(1.02);
+    box-shadow: 0 0 30px #00ff99;
 }
 
-/* Button styling */
-.stButton > button {
+/* Pulse glow animation */
+@keyframes glowPulse {
+    0% {
+        box-shadow: 0 0 10px #00ffff;
+    }
+    100% {
+        box-shadow: 0 0 25px #00ff99;
+    }
+}
+
+/* Drag text styling */
+div[data-testid="stFileUploaderDropzone"] p {
+    color: white !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+}
+
+/* Browse button styling */
+div[data-testid="stFileUploaderDropzone"] button {
     background: linear-gradient(90deg, #00ffff, #00ff99) !important;
     color: black !important;
     font-weight: bold !important;
     border-radius: 12px !important;
-    padding: 10px 25px !important;
+    transition: 0.3s ease;
 }
 
-/* Code blocks */
-pre {
-    background: #0d1117 !important;
-    color: white !important;
-    border-radius: 12px;
+div[data-testid="stFileUploaderDropzone"] button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px #00ff99;
 }
 
 </style>
 """, unsafe_allow_html=True)
-
 
 # ==============================
 # HEADER
