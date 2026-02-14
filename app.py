@@ -1,250 +1,272 @@
 import streamlit as st
 from groq import Groq
-import logging
-import os
 import time
-from datetime import datetime
-from io import BytesIO
 
 # ==============================
-# CONFIGURATION
+# PAGE CONFIG
 # ==============================
-st.set_page_config(
-    page_title="Docker Security Auditor",
-    layout="wide",
-    page_icon="🐳"
-)
-
-# Logging setup (Production style)
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
-)
-
-# Secure API Key Load
-if "GROQ_API_KEY" not in st.secrets:
-    st.error("❌ GROQ_API_KEY not found in secrets.")
-    st.stop()
+st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
 
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # ==============================
-# STYLING (Clean Professional)
+# FULL STYLING
 # ==============================
 st.markdown("""
 <style>
-#MainMenu, footer {visibility: hidden;}
-.stApp { background-color: #0e1117; }
-h1, h2, h3, h4 { color: #00ffff; }
-div[data-testid="stFileUploaderDropzone"] {
-    background: #1c1f26;
-    border: 2px dashed #00ffff;
-    border-radius: 12px;
-    padding: 35px;
+
+/* Hide Streamlit default */
+#MainMenu, header, footer {visibility: hidden;}
+
+/* Background */
+.stApp {
+    background:
+    linear-gradient(rgba(0,0,0,0.90), rgba(0,0,0,0.95)),
+    url("https://images.unsplash.com/photo-1518770660439-4636190af475");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
 }
+
+/* Force text white */
+html, body, p, span, div, li, ul, ol,
+h1, h2, h3, h4, h5, h6 {
+    color: white !important;
+}
+
+/* ==============================
+   ANIMATED DROPZONE
+============================== */
+div[data-testid="stFileUploaderDropzone"] {
+    background: rgba(25,25,25,0.95) !important;
+    border: 2px dashed #00ffff !important;
+    border-radius: 20px !important;
+    padding: 45px !important;
+    transition: all 0.3s ease-in-out;
+    animation: glowPulse 3s infinite alternate;
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 10px #00ffff; }
+    100% { box-shadow: 0 0 25px #00ff99; }
+}
+
+div[data-testid="stFileUploaderDropzone"]:hover {
+    transform: scale(1.02);
+    border-color: #00ff99 !important;
+}
+
+/* Drag text */
 div[data-testid="stFileUploaderDropzone"] p {
     color: white !important;
-    font-weight: 600;
+    font-weight: 600 !important;
+    font-size: 18px !important;
 }
+
+/* ==============================
+   ANIMATED BROWSE BUTTON
+============================== */
+div[data-testid="stFileUploaderDropzone"] button {
+    background: linear-gradient(90deg, #8e2de2, #ff0080) !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-radius: 14px !important;
+    padding: 10px 25px !important;
+    border: none !important;
+    position: relative;
+    overflow: hidden;
+    animation: browseGlow 2s infinite alternate;
+    transition: all 0.3s ease-in-out;
+}
+
+@keyframes browseGlow {
+    0% { box-shadow: 0 0 8px #8e2de2; }
+    100% { box-shadow: 0 0 25px #ff0080; }
+}
+
+div[data-testid="stFileUploaderDropzone"] button:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 35px #ff0080 !important;
+}
+
+div[data-testid="stFileUploaderDropzone"] button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: rgba(255,255,255,0.4);
+    transform: skewX(-25deg);
+    transition: 0.75s;
+}
+
+div[data-testid="stFileUploaderDropzone"] button:hover::after {
+    left: 125%;
+}
+
+/* Run scan button */
+.stButton > button {
+    background: linear-gradient(90deg, #00ffff, #00ff99) !important;
+    color: black !important;
+    font-weight: bold !important;
+    border-radius: 12px !important;
+    padding: 10px 25px !important;
+    animation: glowPulse 2s infinite alternate;
+}
+
+/* Code blocks */
+pre {
+    background: #0d1117 !important;
+    color: white !important;
+    border-radius: 12px;
+}
+
+code {
+    background: #1f2937 !important;
+    color: #00ff99 !important;
+    padding: 3px 6px;
+    border-radius: 6px;
+}
+
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================
 # HEADER
 # ==============================
-st.title("🐳 Docker Image Security Auditor")
-st.caption("Enterprise-Grade Static + AI Powered Dockerfile Scanner")
+st.markdown("<h1 style='text-align:center;color:#00ffff;'>🐳 Docker Image Security Auditor</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center;'>Static + AI Powered Dockerfile Security Scanner</h4>", unsafe_allow_html=True)
 
 # ==============================
 # FILE UPLOAD
 # ==============================
-uploaded_file = st.file_uploader("Upload Dockerfile", type=["txt", "Dockerfile"])
+uploaded_file = st.file_uploader("📤 Upload Dockerfile", type=["txt", "Dockerfile"])
 
 dockerfile_content = ""
 
 if uploaded_file:
-    try:
-        dockerfile_content = uploaded_file.read().decode("utf-8")
-        st.code(dockerfile_content, language="dockerfile")
-    except Exception as e:
-        logging.error(str(e))
-        st.error("Invalid file format.")
-        st.stop()
+    dockerfile_content = uploaded_file.read().decode("utf-8")
+    st.subheader("📄 Uploaded Dockerfile")
+    st.code(dockerfile_content, language="dockerfile")
 
 # ==============================
-# STATIC SCANNER (Improved)
+# STATIC CHECK
 # ==============================
-def static_scan(dockerfile: str):
-    checks = []
-
-    checks.append(("Base Image Defined", "PASS" if "FROM" in dockerfile else "CRITICAL"))
-    checks.append(("Avoid latest tag", "WARNING" if ":latest" in dockerfile else "PASS"))
-    checks.append(("Running as root", "CRITICAL" if "USER root" in dockerfile else "PASS"))
-    checks.append(("HEALTHCHECK Present", "PASS" if "HEALTHCHECK" in dockerfile else "WARNING"))
-    checks.append(("Uses COPY instead of ADD", "WARNING" if "ADD " in dockerfile else "PASS"))
-    checks.append(("Exposes unnecessary ports", "WARNING" if "EXPOSE 22" in dockerfile else "PASS"))
-
-    return checks
+def static_scan(dockerfile):
+    return [
+        ("Base image defined", "PASS" if "FROM" in dockerfile else "CRITICAL"),
+        ("Avoid latest tag", "WARNING" if ":latest" in dockerfile else "PASS"),
+        ("Running as root user", "CRITICAL" if "USER root" in dockerfile else "PASS"),
+        ("Healthcheck present", "PASS" if "HEALTHCHECK" in dockerfile else "WARNING"),
+    ]
 
 # ==============================
-# RISK CALCULATION
+# AI ANALYSIS
 # ==============================
-def calculate_risk(results):
-    score_map = {"PASS": 0, "WARNING": 5, "CRITICAL": 15}
-    total_score = sum(score_map[r[1]] for r in results)
-    return min(100, total_score)
-
-# ==============================
-# AI ANALYSIS (Protected)
-# ==============================
-def ai_analysis(dockerfile: str):
-
-    dockerfile = dockerfile[:3500]
+def ai_analysis(dockerfile):
+    dockerfile = dockerfile[:4000]
 
     prompt = f"""
 You are a Senior DevSecOps Engineer.
 
-Analyze the Dockerfile and provide:
-
-1. Risk Percentage (numeric)
+Analyze this Dockerfile and provide:
+1. Overall Risk Percentage
 2. Security Risks
 3. Explanation
-4. Recommendations
+4. Recommended Fixes
 5. Best Practices
 """
 
-    try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You are a Docker security expert."},
-                {"role": "user", "content": prompt + dockerfile}
-            ],
-            temperature=0.2,
-            max_tokens=1000,
-            timeout=30
-        )
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": "You are a Docker security expert."},
+            {"role": "user", "content": prompt + dockerfile}
+        ],
+        temperature=0.3,
+        max_tokens=1200
+    )
 
-        return response.choices[0].message.content
-
-    except Exception as e:
-        logging.error(str(e))
-        return "⚠ AI analysis failed. Please try again later."
+    return response.choices[0].message.content
 
 # ==============================
-# AUTO FIX
+# AUTO FIX FUNCTION
 # ==============================
-def generate_secure_dockerfile(dockerfile: str):
-
-    prompt = f"""
+def auto_fix_dockerfile(dockerfile):
+    fix_prompt = f"""
 Fix all security issues in this Dockerfile.
-Return ONLY the improved Dockerfile.
+Return ONLY the improved secure Dockerfile code.
 
 Dockerfile:
 {dockerfile}
 """
 
-    try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You are a Docker security expert."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.2,
-            max_tokens=1000,
-            timeout=30
-        )
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": "You are a Docker security expert."},
+            {"role": "user", "content": fix_prompt}
+        ],
+        temperature=0.2,
+        max_tokens=1200
+    )
 
-        return response.choices[0].message.content
-
-    except Exception as e:
-        logging.error(str(e))
-        return None
-
-# ==============================
-# DOWNLOAD REPORT
-# ==============================
-def generate_report(dockerfile, static_results, ai_text, risk_percent):
-    report = f"""
-DOCKER SECURITY AUDIT REPORT
-Generated: {datetime.now()}
-
-Overall Risk: {risk_percent}%
-
-STATIC ANALYSIS:
-"""
-    for check, status in static_results:
-        report += f"- {check}: {status}\n"
-
-    report += "\nAI ANALYSIS:\n"
-    report += ai_text
-
-    return report
+    return response.choices[0].message.content
 
 # ==============================
 # RUN SCAN
 # ==============================
-if st.button("🔍 Run Security Scan"):
+if st.button("🔍 Run Full Security Scan"):
 
     if not dockerfile_content.strip():
-        st.warning("Upload a Dockerfile first.")
-        st.stop()
+        st.warning("⚠ Please upload a Dockerfile first.")
+    else:
 
-    with st.spinner("Running Static Analysis..."):
-        static_results = static_scan(dockerfile_content)
-        risk_percent = calculate_risk(static_results)
+        progress = st.progress(0)
+        for i in range(100):
+            time.sleep(0.01)
+            progress.progress(i + 1)
 
-    st.subheader("📊 Static Results")
-    st.progress(risk_percent / 100)
-    st.write(f"Overall Risk Score: {risk_percent}%")
+        st.subheader("📊 Static Security Analysis")
 
-    for check, status in static_results:
-        if status == "PASS":
-            st.success(f"{check}")
-        elif status == "WARNING":
-            st.warning(f"{check}")
-        else:
-            st.error(f"{check}")
+        results = static_scan(dockerfile_content)
 
-    st.divider()
+        score_map = {"PASS": 0, "WARNING": 5, "CRITICAL": 10}
+        risk_score = sum(score_map[s] for _, s in results)
+        risk_percent = min(100, risk_score)
 
-    st.subheader("🤖 AI Expert Review")
-    with st.spinner("AI analyzing..."):
-        ai_text = ai_analysis(dockerfile_content)
-    st.markdown(ai_text)
+        st.markdown(f"### 🔐 Overall Risk Level: {risk_percent}%")
+        st.progress(risk_percent / 100)
 
-    st.divider()
+        for check, status in results:
+            if status == "PASS":
+                st.success(f"🟢 {check}")
+            elif status == "WARNING":
+                st.warning(f"🟡 {check}")
+            else:
+                st.error(f"🔴 {check}")
 
-    # AUTO FIX
-    st.subheader("🛠 Auto-Fix")
-    if st.button("Generate Secure Dockerfile"):
-        with st.spinner("Generating..."):
-            secure_file = generate_secure_dockerfile(dockerfile_content)
+        st.divider()
 
-        if secure_file:
-            st.code(secure_file, language="dockerfile")
+        st.subheader("🤖 AI Security Expert Analysis")
+        with st.spinner("AI analyzing Dockerfile..."):
+            ai_report = ai_analysis(dockerfile_content)
+        st.markdown(ai_report)
 
-            st.download_button(
-                label="⬇ Download Secure Dockerfile",
-                data=secure_file,
-                file_name="secure_Dockerfile",
-                mime="text/plain"
-            )
+        st.divider()
 
-    st.divider()
+        # ==============================
+        # AUTO FIX BUTTON
+        # ==============================
+        st.subheader("🛠 Auto-Fix Dockerfile")
 
-    # DOWNLOAD REPORT
-    report_text = generate_report(dockerfile_content, static_results, ai_text, risk_percent)
+        if st.button("🚀 Generate Secure Dockerfile"):
+            with st.spinner("Generating secure version..."):
+                fixed_code = auto_fix_dockerfile(dockerfile_content)
 
-    st.download_button(
-        label="📄 Download Security Report",
-        data=report_text,
-        file_name="security_report.txt",
-        mime="text/plain"
-    )
+            st.success("✅ Secure Dockerfile Generated")
+            st.code(fixed_code, language="dockerfile")
 
-# ==============================
-# FOOTER
-# ==============================
-st.caption("Enterprise Docker Security Auditor | Production Ready | DevSecOps Tool")
+        st.divider()
+        st.caption("Docker Image Security Auditor | AI Powered by Groq")
