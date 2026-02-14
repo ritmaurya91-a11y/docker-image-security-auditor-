@@ -13,44 +13,69 @@ st.markdown("""
 header, footer, #MainMenu {visibility: hidden;}
 .block-container {padding-top: 1.5rem;}
 
+/* Background */
 .stApp {
     background:
-    linear-gradient(to bottom, rgba(0,0,0,0.75), rgba(0,0,0,0.9)),
+    linear-gradient(to bottom, rgba(0,0,0,0.85), rgba(0,0,0,0.95)),
     url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
+/* Force ALL text white */
+html, body, [class*="css"] {
+    color: white !important;
+}
+
+/* Title */
 .title {
     font-size: 50px;
     font-weight: 900;
     text-align: center;
-    color: #00ffff;
-    text-shadow: 0 0 12px rgba(0,255,255,0.8);
+    color: #00ffff !important;
+    text-shadow: 0 0 15px rgba(0,255,255,0.8);
 }
 
 .subtitle {
     text-align: center;
     font-size: 20px;
-    color: #ffffff;
+    color: #ffffff !important;
     margin-bottom: 35px;
 }
 
-h2, h3, h4, p, span, div {
+/* Upload box styling */
+section[data-testid="stFileUploader"] > div {
+    background-color: rgba(25,25,25,0.85) !important;
+    border-radius: 15px;
+    padding: 20px;
     color: white !important;
 }
 
+/* Upload label */
+section[data-testid="stFileUploader"] label {
+    color: white !important;
+    font-weight: 600;
+}
+
+/* Uploaded filename */
+span {
+    color: white !important;
+}
+
+/* Code block */
 pre {
     background: #0d1117 !important;
     color: #ffffff !important;
     border-radius: 12px;
 }
 
+/* Status boxes */
 .stSuccess {background-color: rgba(0,150,0,0.25) !important;}
 .stWarning {background-color: rgba(255,165,0,0.25) !important;}
 .stError {background-color: rgba(255,0,0,0.25) !important;}
 
+/* Progress bar */
 .stProgress > div > div {
     background-color: #00ffff !important;
 }
@@ -103,7 +128,7 @@ Dockerfile:
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",   # ✅ Updated working model
+            model="llama-3.3-70b-versatile",
             messages=[
                 {"role": "system", "content": "You are a Docker security expert."},
                 {"role": "user", "content": prompt}
@@ -124,7 +149,7 @@ if st.button("🔍 Run Full Security Scan"):
         st.warning("⚠ Please upload Dockerfile first")
     else:
 
-        # ----- Static Scan -----
+        # Static Scan
         st.subheader("📊 Static Security Analysis")
         results = audit_dockerfile(dockerfile_content)
 
@@ -152,7 +177,7 @@ if st.button("🔍 Run Full Security Scan"):
 
         st.divider()
 
-        # ----- AI Scan -----
+        # AI Scan
         st.subheader("🤖 AI Security Expert Analysis")
 
         with st.spinner("AI analyzing Dockerfile..."):
@@ -162,3 +187,4 @@ if st.button("🔍 Run Full Security Scan"):
 
         st.divider()
         st.caption("Docker Image Security Auditor | AI Powered by Groq")
+
