@@ -97,6 +97,52 @@ h4 {
     text-align: center !important;
     color: #e0e0e0 !important;
 }
+/* ==============================
+   DROP TEXT GLOW EFFECT
+============================== */
+
+div[data-testid="stFileUploaderDropzone"] p {
+    color: #00ffff !important;
+    font-weight: 700 !important;
+    text-shadow:
+        0 0 5px #00ffff,
+        0 0 10px #00ffff,
+        0 0 20px #00ffff;
+    animation: dropTextGlow 2s infinite alternate;
+}
+
+@keyframes dropTextGlow {
+    from {
+        text-shadow:
+            0 0 5px #00ffff,
+            0 0 10px #00ffff;
+    }
+    to {
+        text-shadow:
+            0 0 15px #00ffff,
+            0 0 30px #00ffcc,
+            0 0 45px #00ffcc;
+    }
+}
+
+/* ==============================
+   BROWSE BUTTON GLOW
+============================== */
+
+div[data-testid="stFileUploaderDropzone"] button {
+    animation: browseGlow 2s infinite alternate;
+    box-shadow: 0 0 10px #ff00ff;
+}
+
+@keyframes browseGlow {
+    from {
+        box-shadow: 0 0 10px #ff00ff;
+    }
+    to {
+        box-shadow: 0 0 25px #ff0080,
+                    0 0 45px #ff0080;
+    }
+}
 
 /* ==============================
    FILE UPLOADER
