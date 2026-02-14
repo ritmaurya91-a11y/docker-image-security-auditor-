@@ -3,82 +3,80 @@ from groq import Groq
 import time
 
 # ==============================
-# CONFIG
+# PAGE CONFIG
 # ==============================
 st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
 
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # ==============================
-# COMPLETE CSS (FULL VISIBILITY FIX)
+# FULL CSS FIX (INCLUDING DRAG TEXT)
 # ==============================
 st.markdown("""
 <style>
 
-/* Hide default */
+/* Hide default Streamlit menu */
 #MainMenu, header, footer {visibility: hidden;}
 
 /* Background */
 .stApp {
     background:
-    linear-gradient(rgba(0,0,0,0.90), rgba(0,0,0,0.95)),
+    linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.96)),
     url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* FORCE ALL TEXT WHITE */
-html, body,
-p, span, div,
+/* Force ALL text solid white */
+html, body, p, span, div, li, ul, ol,
 h1, h2, h3, h4, h5, h6,
-li, ul, ol,
 label, strong, em,
 [data-testid="stMarkdownContainer"] {
     color: #ffffff !important;
     opacity: 1 !important;
 }
 
-/* Headers color */
-h2, h3 {
-    color: #00ffff !important;
+/* ==============================
+   FIX DRAG & DROP TEXT
+============================== */
+div[data-testid="stFileUploaderDropzone"] {
+    background: rgba(20,20,20,0.95) !important;
+    border: 2px dashed #00ffff !important;
+    border-radius: 18px !important;
+    padding: 45px !important;
+    animation: glow 2s infinite;
+    transition: 0.3s ease;
 }
 
-/* ==============================
-   GLOW ANIMATION
-============================== */
+div[data-testid="stFileUploaderDropzone"]:hover {
+    transform: scale(1.02);
+    border-color: #00ff99 !important;
+}
+
+/* Main drag text */
+div[data-testid="stFileUploaderDropzone"] span {
+    color: #ffffff !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
+}
+
+/* Sub text (limit file size) */
+div[data-testid="stFileUploaderDropzone"] small {
+    color: #ffffff !important;
+    font-size: 14px !important;
+    opacity: 1 !important;
+}
+
+/* Glow animation */
 @keyframes glow {
     0% { box-shadow: 0 0 5px #00ffff; }
     50% { box-shadow: 0 0 25px #00ff99; }
     100% { box-shadow: 0 0 5px #00ffff; }
 }
 
-section[data-testid="stFileUploader"] {
-    background: rgba(20,20,20,0.95) !important;
-    padding: 25px !important;
-    border-radius: 18px !important;
-    border: 2px dashed #00ffff !important;
-    animation: glow 2s infinite;
-    transition: 0.3s ease;
-}
-
-/* Hover */
-section[data-testid="stFileUploader"]:hover {
-    transform: scale(1.02);
-    border-color: #00ff99 !important;
-}
-
-/* Drag text style */
-section[data-testid="stFileUploader"] p {
-    font-size: 18px !important;
-    font-weight: 700 !important;
-    background: linear-gradient(90deg, #00ffff, #00ff99);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-align: center;
-}
-
-/* Button animation */
+/* Button pulse animation */
 @keyframes pulse {
     0% { box-shadow: 0 0 5px #00ffff; }
     50% { box-shadow: 0 0 25px #00ff99; }
@@ -136,7 +134,7 @@ if uploaded_file:
     st.code(dockerfile_content, language="dockerfile")
 
 # ==============================
-# STATIC SCAN
+# STATIC CHECK
 # ==============================
 def static_scan(dockerfile):
     return [
