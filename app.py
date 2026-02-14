@@ -46,13 +46,11 @@ div[data-testid="stFileUploaderDropzone"] {
     animation: glowPulse 3s infinite alternate;
 }
 
-/* Glow animation */
 @keyframes glowPulse {
     0% { box-shadow: 0 0 10px #00ffff; }
     100% { box-shadow: 0 0 25px #00ff99; }
 }
 
-/* Hover lift */
 div[data-testid="stFileUploaderDropzone"]:hover {
     transform: scale(1.02);
     border-color: #00ff99 !important;
@@ -81,19 +79,16 @@ div[data-testid="stFileUploaderDropzone"] button {
     transition: all 0.3s ease-in-out;
 }
 
-/* Button glow */
 @keyframes browseGlow {
     0% { box-shadow: 0 0 8px #8e2de2; }
     100% { box-shadow: 0 0 25px #ff0080; }
 }
 
-/* Hover zoom */
 div[data-testid="stFileUploaderDropzone"] button:hover {
     transform: scale(1.08);
     box-shadow: 0 0 35px #ff0080 !important;
 }
 
-/* Shine sweep */
 div[data-testid="stFileUploaderDropzone"] button::after {
     content: "";
     position: absolute;
@@ -181,24 +176,43 @@ Analyze this Dockerfile and provide:
 3. Explanation
 4. Recommended Fixes
 5. Best Practices
+"""
+
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": "You are a Docker security expert."},
+            {"role": "user", "content": prompt + dockerfile}
+        ],
+        temperature=0.3,
+        max_tokens=1200
+    )
+
+    return response.choices[0].message.content
+
+# ==============================
+# AUTO FIX FUNCTION
+# ==============================
+def auto_fix_dockerfile(dockerfile):
+    fix_prompt = f"""
+Fix all security issues in this Dockerfile.
+Return ONLY the improved secure Dockerfile code.
 
 Dockerfile:
 {dockerfile}
 """
 
-    try:
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=[
-                {"role": "system", "content": "You are a Docker security expert."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.3,
-            max_tokens=1200
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"❌ AI Error: {str(e)}"
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": "You are a Docker security expert."},
+            {"role": "user", "content": fix_prompt}
+        ],
+        temperature=0.2,
+        max_tokens=1200
+    )
+
+    return response.choices[0].message.content
 
 # ==============================
 # RUN SCAN
@@ -236,11 +250,23 @@ if st.button("🔍 Run Full Security Scan"):
         st.divider()
 
         st.subheader("🤖 AI Security Expert Analysis")
-
         with st.spinner("AI analyzing Dockerfile..."):
             ai_report = ai_analysis(dockerfile_content)
-
         st.markdown(ai_report)
+
+        st.divider()
+
+        # ==============================
+        # AUTO FIX BUTTON
+        # ==============================
+        st.subheader("🛠 Auto-Fix Dockerfile")
+
+        if st.button("🚀 Generate Secure Dockerfile"):
+            with st.spinner("Generating secure version..."):
+                fixed_code = auto_fix_dockerfile(dockerfile_content)
+
+            st.success("✅ Secure Dockerfile Generated")
+            st.code(fixed_code, language="dockerfile")
 
         st.divider()
         st.caption("Docker Image Security Auditor | AI Powered by Groq")
