@@ -18,10 +18,10 @@ st.markdown("""
 /* Hide Streamlit default */
 #MainMenu, header, footer {visibility: hidden;}
 
-/* Background */
+/* Background FIXED (more visible image) */
 .stApp {
     background:
-    linear-gradient(rgba(0,0,0,0.90), rgba(0,0,0,0.95)),
+    linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)),
     url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
@@ -29,80 +29,56 @@ st.markdown("""
 }
 
 /* Force text white */
-html, body, p, span, div, li, ul, ol,
-h1, h2, h3, h4, h5, h6 {
+html, body, p, span, div, li, ul, ol, h1, h2, h3, h4, h5, h6 {
     color: white !important;
 }
 
 /* ==============================
-   ANIMATED DROPZONE
+   GLOWING TITLE FIX
+============================== */
+h1 {
+    font-size: 52px !important;
+    font-weight: 900 !important;
+    color: #00ffff !important;
+    text-align: center !important;
+    text-shadow:
+        0 0 5px #00ffff,
+        0 0 10px #00ffff,
+        0 0 20px #00ffff,
+        0 0 40px #00ffff;
+    animation: titleGlow 2s infinite alternate;
+}
+
+@keyframes titleGlow {
+    from {
+        text-shadow:
+            0 0 5px #00ffff,
+            0 0 10px #00ffff,
+            0 0 20px #00ffff;
+    }
+    to {
+        text-shadow:
+            0 0 10px #00ffff,
+            0 0 25px #00ffcc,
+            0 0 50px #00ffcc;
+    }
+}
+
+/* Subtitle */
+h4 {
+    text-align: center !important;
+    color: #e0e0e0 !important;
+}
+
+/* ==============================
+   FILE UPLOADER
 ============================== */
 div[data-testid="stFileUploaderDropzone"] {
-    background: rgba(25,25,25,0.95) !important;
+    background: rgba(25,25,25,0.85) !important;
     border: 2px dashed #00ffff !important;
     border-radius: 20px !important;
     padding: 45px !important;
     transition: all 0.3s ease-in-out;
-    animation: glowPulse 3s infinite alternate;
-}
-
-@keyframes glowPulse {
-    0% { box-shadow: 0 0 10px #00ffff; }
-    100% { box-shadow: 0 0 25px #00ff99; }
-}
-
-div[data-testid="stFileUploaderDropzone"]:hover {
-    transform: scale(1.02);
-    border-color: #00ff99 !important;
-}
-
-/* Drag text */
-div[data-testid="stFileUploaderDropzone"] p {
-    color: white !important;
-    font-weight: 600 !important;
-    font-size: 18px !important;
-}
-
-/* ==============================
-   ANIMATED BROWSE BUTTON
-============================== */
-div[data-testid="stFileUploaderDropzone"] button {
-    background: linear-gradient(90deg, #8e2de2, #ff0080) !important;
-    color: white !important;
-    font-weight: bold !important;
-    border-radius: 14px !important;
-    padding: 10px 25px !important;
-    border: none !important;
-    position: relative;
-    overflow: hidden;
-    animation: browseGlow 2s infinite alternate;
-    transition: all 0.3s ease-in-out;
-}
-
-@keyframes browseGlow {
-    0% { box-shadow: 0 0 8px #8e2de2; }
-    100% { box-shadow: 0 0 25px #ff0080; }
-}
-
-div[data-testid="stFileUploaderDropzone"] button:hover {
-    transform: scale(1.08);
-    box-shadow: 0 0 35px #ff0080 !important;
-}
-
-div[data-testid="stFileUploaderDropzone"] button::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: -75%;
-    width: 50%;
-    height: 100%;
-    background: rgba(255,255,255,0.4);
-    transform: skewX(-25deg);
-    transition: 0.75s;
-}
-
-div[data-testid="stFileUploaderDropzone"] button:hover::after {
-    left: 125%;
 }
 
 /* Run scan button */
@@ -112,7 +88,6 @@ div[data-testid="stFileUploaderDropzone"] button:hover::after {
     font-weight: bold !important;
     border-radius: 12px !important;
     padding: 10px 25px !important;
-    animation: glowPulse 2s infinite alternate;
 }
 
 /* Code blocks */
