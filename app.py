@@ -14,11 +14,8 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 # ==============================
 st.markdown("""
 <style>
-
-/* Hide Streamlit default */
 #MainMenu, header, footer {visibility: hidden;}
 
-/* Background FIXED (more visible image) */
 .stApp {
     background:
     linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.75)),
@@ -28,42 +25,10 @@ st.markdown("""
     background-attachment: fixed;
 }
 
-/* Force text white */
 html, body, p, span, div, li, ul, ol, h1, h2, h3, h4, h5, h6 {
     color: white !important;
 }
-/* ==============================
-   GLOW EFFECT FOR UPLOAD LABEL
-============================== */
 
-label[for="file_uploader"] {
-    font-size: 20px !important;
-    font-weight: 700 !important;
-    color: #00ffff !important;
-    text-shadow:
-        0 0 5px #00ffff,
-        0 0 10px #00ffff,
-        0 0 20px #00ffff;
-    animation: uploadGlow 2s infinite alternate;
-}
-
-@keyframes uploadGlow {
-    from {
-        text-shadow:
-            0 0 5px #00ffff,
-            0 0 10px #00ffff;
-    }
-    to {
-        text-shadow:
-            0 0 10px #00ffff,
-            0 0 25px #00ffcc,
-            0 0 40px #00ffcc;
-    }
-}
-
-/* ==============================
-   GLOWING TITLE FIX
-============================== */
 h1 {
     font-size: 52px !important;
     font-weight: 900 !important;
@@ -71,100 +36,39 @@ h1 {
     text-align: center !important;
     text-shadow:
         0 0 5px #00ffff,
-        0 0 10px #00ffff,
-        0 0 20px #00ffff,
-        0 0 40px #00ffff;
+        0 0 15px #00ffff,
+        0 0 35px #00ffff;
     animation: titleGlow 2s infinite alternate;
 }
 
 @keyframes titleGlow {
-    from {
-        text-shadow:
-            0 0 5px #00ffff,
-            0 0 10px #00ffff,
-            0 0 20px #00ffff;
-    }
-    to {
-        text-shadow:
-            0 0 10px #00ffff,
-            0 0 25px #00ffcc,
-            0 0 50px #00ffcc;
-    }
+    from { text-shadow: 0 0 10px #00ffff; }
+    to { text-shadow: 0 0 40px #00ffcc; }
 }
 
-/* Subtitle */
-h4 {
-    text-align: center !important;
-    color: #e0e0e0 !important;
-}
-/* ==============================
-   DROP TEXT GLOW EFFECT
-============================== */
-
-div[data-testid="stFileUploaderDropzone"] p {
-    color: #00ffff !important;
-    font-weight: 700 !important;
-    text-shadow:
-        0 0 5px #00ffff,
-        0 0 10px #00ffff,
-        0 0 20px #00ffff;
-    animation: dropTextGlow 2s infinite alternate;
-}
-
-@keyframes dropTextGlow {
-    from {
-        text-shadow:
-            0 0 5px #00ffff,
-            0 0 10px #00ffff;
-    }
-    to {
-        text-shadow:
-            0 0 15px #00ffff,
-            0 0 30px #00ffcc,
-            0 0 45px #00ffcc;
-    }
-}
-
-/* ==============================
-   BROWSE BUTTON GLOW
-============================== */
-
-div[data-testid="stFileUploaderDropzone"] button {
-    animation: browseGlow 2s infinite alternate;
-    box-shadow: 0 0 10px #ff00ff;
-}
-
-@keyframes browseGlow {
-    from {
-        box-shadow: 0 0 10px #ff00ff;
-    }
-    to {
-        box-shadow: 0 0 25px #ff0080,
-                    0 0 45px #ff0080;
-    }
-}
-
-/* ==============================
-   FILE UPLOADER
-============================== */
 div[data-testid="stFileUploaderDropzone"] {
     background: rgba(25,25,25,0.85) !important;
     border: 2px dashed #00ffff !important;
     border-radius: 20px !important;
     padding: 45px !important;
-    transition: all 0.3s ease-in-out;
 }
 
-/* Run scan button */
+div[data-testid="stFileUploaderDropzone"] div {
+    color: #00ffff !important;
+    text-shadow: 0 0 10px #00ffff;
+}
+
+div[data-testid="stFileUploaderDropzone"] button {
+    box-shadow: 0 0 15px #ff00ff;
+}
+
 .stButton > button {
     background: linear-gradient(90deg, #00ffff, #00ff99) !important;
     color: black !important;
     font-weight: bold !important;
     border-radius: 12px !important;
-    padding: 10px 25px !important;
 }
 
-/* Code blocks */
 pre {
     background: #0d1117 !important;
     color: white !important;
@@ -177,14 +81,13 @@ code {
     padding: 3px 6px;
     border-radius: 6px;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================
 # HEADER
 # ==============================
-st.markdown("<h1 style='text-align:center;color:#00ffff;'>🐳 Docker Image Security Auditor</h1>", unsafe_allow_html=True)
+st.markdown("<h1>🐳 Docker Image Security Auditor</h1>", unsafe_allow_html=True)
 st.markdown("<h4 style='text-align:center;'>Static + AI Powered Dockerfile Security Scanner</h4>", unsafe_allow_html=True)
 
 # ==============================
@@ -225,24 +128,30 @@ Analyze this Dockerfile and provide:
 3. Explanation
 4. Recommended Fixes
 5. Best Practices
+
+Dockerfile:
+{dockerfile}
 """
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "system", "content": "You are a Docker security expert."},
-            {"role": "user", "content": prompt + dockerfile}
-        ],
-        temperature=0.3,
-        max_tokens=1200
-    )
-
-    return response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are a Docker security expert."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=1200
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"❌ AI Error: {str(e)}"
 
 # ==============================
 # AUTO FIX FUNCTION
 # ==============================
 def auto_fix_dockerfile(dockerfile):
+
     fix_prompt = f"""
 Fix all security issues in this Dockerfile.
 Return ONLY the improved secure Dockerfile code.
@@ -251,26 +160,33 @@ Dockerfile:
 {dockerfile}
 """
 
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[
-            {"role": "system", "content": "You are a Docker security expert."},
-            {"role": "user", "content": fix_prompt}
-        ],
-        temperature=0.2,
-        max_tokens=1200
-    )
-
-    return response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are a Docker security expert."},
+                {"role": "user", "content": fix_prompt}
+            ],
+            temperature=0.2,
+            max_tokens=1200
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"❌ Auto-Fix Error: {str(e)}"
 
 # ==============================
-# RUN SCAN
+# RUN SCAN BUTTON
 # ==============================
-if st.button("🔍 Run Full Security Scan"):
+
+run_scan = st.button("🔍 Run Full Security Scan")
+
+if run_scan:
 
     if not dockerfile_content.strip():
         st.warning("⚠ Please upload a Dockerfile first.")
     else:
+
+        st.session_state["dockerfile"] = dockerfile_content
 
         progress = st.progress(0)
         for i in range(100):
@@ -301,21 +217,27 @@ if st.button("🔍 Run Full Security Scan"):
         st.subheader("🤖 AI Security Expert Analysis")
         with st.spinner("AI analyzing Dockerfile..."):
             ai_report = ai_analysis(dockerfile_content)
+
         st.markdown(ai_report)
-
         st.divider()
 
-        # ==============================
-        # AUTO FIX BUTTON
-        # ==============================
-        st.subheader("🛠 Auto-Fix Dockerfile")
+# ==============================
+# AUTO FIX SECTION
+# ==============================
 
-        if st.button("🚀 Generate Secure Dockerfile"):
-            with st.spinner("Generating secure version..."):
-                fixed_code = auto_fix_dockerfile(dockerfile_content)
+if "dockerfile" in st.session_state:
 
-            st.success("✅ Secure Dockerfile Generated")
-            st.code(fixed_code, language="dockerfile")
+    st.subheader("🛠 Auto-Fix Dockerfile")
 
-        st.divider()
-        st.caption("Docker Image Security Auditor | AI Powered by Groq")
+    generate_fix = st.button("🚀 Generate Secure Dockerfile")
+
+    if generate_fix:
+        with st.spinner("Generating secure version..."):
+            fixed_code = auto_fix_dockerfile(st.session_state["dockerfile"])
+
+        st.success("✅ Secure Dockerfile Generated")
+        st.code(fixed_code, language="dockerfile")
+
+    st.divider()
+    st.caption("Docker Image Security Auditor | AI Powered by Groq")
+    
