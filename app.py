@@ -15,44 +15,77 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 st.markdown("""
 <style>
 
-/* Keep Background Image */
+/* Hide default menu */
+#MainMenu, header, footer {visibility: hidden;}
+
+/* Background */
 .stApp {
     background:
-    linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.90)),
+    linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.96)),
     url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* Do NOT override whole page text */
-html, body {
-    color: white;
+/* Force all text white */
+html, body, p, span, div, li, ul, ol,
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff !important;
 }
 
-/* =========================
-   ONLY CHANGE UPLOADER TEXT
-========================= */
+/* ==============================
+   ULTRA FIX FOR DROPZONE TEXT
+============================== */
 
-/* Drag and drop text → BLACK */
-div[data-testid="stFileUploaderDropzone"] p {
-    color: #000000 !important;
+/* Target entire uploader */
+div[data-testid="stFileUploader"] * {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* Target dropzone specifically */
+div[data-testid="stFileUploaderDropzone"] * {
+    color: #ffffff !important;
+    opacity: 1 !important;
     font-weight: 600 !important;
 }
 
-/* Browse files button text → BLACK */
-div[data-testid="stFileUploaderDropzone"] button {
-    color: #000000 !important;
-    font-weight: 600 !important;
+/* Add stylish border */
+div[data-testid="stFileUploaderDropzone"] {
+    background: rgba(20,20,20,0.95) !important;
+    border: 2px dashed #00ffff !important;
+    border-radius: 18px !important;
+    padding: 50px !important;
+    transition: 0.3s ease;
 }
 
-/* Upload icon → BLACK */
-div[data-testid="stFileUploaderDropzone"] svg {
-    fill: #000000 !important;
+/* Hover glow */
+div[data-testid="stFileUploaderDropzone"]:hover {
+    border-color: #00ff99 !important;
+    box-shadow: 0 0 25px #00ff99;
+    transform: scale(1.02);
+}
+
+/* Button styling */
+.stButton > button {
+    background: linear-gradient(90deg, #00ffff, #00ff99) !important;
+    color: black !important;
+    font-weight: bold !important;
+    border-radius: 12px !important;
+    padding: 10px 25px !important;
+}
+
+/* Code blocks */
+pre {
+    background: #0d1117 !important;
+    color: white !important;
+    border-radius: 12px;
 }
 
 </style>
 """, unsafe_allow_html=True)
+
 
 # ==============================
 # HEADER
