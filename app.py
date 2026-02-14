@@ -47,20 +47,9 @@ pre {
     border-radius: 12px;
 }
 
-.stSuccess {
-    background-color: rgba(0, 150, 0, 0.25) !important;
-    color: #eaffea !important;
-}
-
-.stWarning {
-    background-color: rgba(255, 165, 0, 0.25) !important;
-    color: #fff4d6 !important;
-}
-
-.stError {
-    background-color: rgba(255, 0, 0, 0.25) !important;
-    color: #ffe6e6 !important;
-}
+.stSuccess {background-color: rgba(0,150,0,0.25) !important;}
+.stWarning {background-color: rgba(255,165,0,0.25) !important;}
+.stError {background-color: rgba(255,0,0,0.25) !important;}
 
 .stProgress > div > div {
     background-color: #00ffff !important;
@@ -95,6 +84,9 @@ def audit_dockerfile(dockerfile):
 # ---------- AI Analysis ----------
 def ai_security_analysis(dockerfile):
 
+    # Prevent very large prompt crash
+    dockerfile = dockerfile[:4000]
+
     prompt = f"""
 You are a senior DevSecOps engineer.
 
@@ -110,16 +102,21 @@ Dockerfile:
 {dockerfile}
 """
 
-    response = client.chat.completions.create(
-        model="llama3-70b-8192",
-        messages=[
-            {"role": "system", "content": "You are a Docker security expert."},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=0.3
-    )
+    try:
+        response = client.chat.completions.create(
+            model="llama3-70b-8192",
+            messages=[
+                {"role": "system", "content": "You are a Docker security expert."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=1500
+        )
 
-    return response.choices[0].message.content
+        return response.choices[0].message.content
+
+    except Exception as e:
+        return f"❌ AI Error: {str(e)}"
 
 # ---------- Scan ----------
 if st.button("🔍 Run Full Security Scan"):
@@ -159,7 +156,7 @@ if st.button("🔍 Run Full Security Scan"):
         # ----- AI Scan -----
         st.subheader("🤖 AI Security Expert Analysis")
 
-        with st.spinner("AI analyzing Dockerfile using Groq..."):
+        with st.spinner("AI analyzing Dockerfile..."):
             ai_report = ai_security_analysis(dockerfile_content)
 
         st.markdown(ai_report)
