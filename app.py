@@ -32,6 +32,34 @@ st.markdown("""
 html, body, p, span, div, li, ul, ol, h1, h2, h3, h4, h5, h6 {
     color: white !important;
 }
+/* ==============================
+   GLOW EFFECT FOR UPLOAD LABEL
+============================== */
+
+label[for="file_uploader"] {
+    font-size: 20px !important;
+    font-weight: 700 !important;
+    color: #00ffff !important;
+    text-shadow:
+        0 0 5px #00ffff,
+        0 0 10px #00ffff,
+        0 0 20px #00ffff;
+    animation: uploadGlow 2s infinite alternate;
+}
+
+@keyframes uploadGlow {
+    from {
+        text-shadow:
+            0 0 5px #00ffff,
+            0 0 10px #00ffff;
+    }
+    to {
+        text-shadow:
+            0 0 10px #00ffff,
+            0 0 25px #00ffcc,
+            0 0 40px #00ffcc;
+    }
+}
 
 /* ==============================
    GLOWING TITLE FIX
