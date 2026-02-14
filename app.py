@@ -10,101 +10,123 @@ st.set_page_config(page_title="Docker Image Security Auditor", layout="wide")
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # ==============================
-# FULL CSS FIX (INCLUDING DRAG TEXT)
+# FULL STYLING
 # ==============================
 st.markdown("""
 <style>
 
-/* Hide default Streamlit menu */
+/* Hide Streamlit default */
 #MainMenu, header, footer {visibility: hidden;}
 
 /* Background */
 .stApp {
     background:
-    linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.96)),
+    linear-gradient(rgba(0,0,0,0.90), rgba(0,0,0,0.95)),
     url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* Force ALL text solid white */
+/* Force text white */
 html, body, p, span, div, li, ul, ol,
-h1, h2, h3, h4, h5, h6,
-label, strong, em,
-[data-testid="stMarkdownContainer"] {
-    color: #ffffff !important;
-    opacity: 1 !important;
+h1, h2, h3, h4, h5, h6 {
+    color: white !important;
 }
 
 /* ==============================
-   FIX DRAG & DROP TEXT
+   ANIMATED DROPZONE
 ============================== */
 div[data-testid="stFileUploaderDropzone"] {
-    background: rgba(20,20,20,0.95) !important;
+    background: rgba(25,25,25,0.95) !important;
     border: 2px dashed #00ffff !important;
-    border-radius: 18px !important;
+    border-radius: 20px !important;
     padding: 45px !important;
-    animation: glow 2s infinite;
-    transition: 0.3s ease;
+    transition: all 0.3s ease-in-out;
+    animation: glowPulse 3s infinite alternate;
 }
 
+/* Glow animation */
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 10px #00ffff; }
+    100% { box-shadow: 0 0 25px #00ff99; }
+}
+
+/* Hover lift */
 div[data-testid="stFileUploaderDropzone"]:hover {
     transform: scale(1.02);
     border-color: #00ff99 !important;
 }
 
-/* Main drag text */
-div[data-testid="stFileUploaderDropzone"] span {
-    color: #ffffff !important;
+/* Drag text */
+div[data-testid="stFileUploaderDropzone"] p {
+    color: white !important;
+    font-weight: 600 !important;
     font-size: 18px !important;
-    font-weight: 700 !important;
-    opacity: 1 !important;
 }
 
-/* Sub text (limit file size) */
-div[data-testid="stFileUploaderDropzone"] small {
-    color: #ffffff !important;
-    font-size: 14px !important;
-    opacity: 1 !important;
+/* ==============================
+   ANIMATED BROWSE BUTTON
+============================== */
+div[data-testid="stFileUploaderDropzone"] button {
+    background: linear-gradient(90deg, #8e2de2, #ff0080) !important;
+    color: white !important;
+    font-weight: bold !important;
+    border-radius: 14px !important;
+    padding: 10px 25px !important;
+    border: none !important;
+    position: relative;
+    overflow: hidden;
+    animation: browseGlow 2s infinite alternate;
+    transition: all 0.3s ease-in-out;
 }
 
-/* Glow animation */
-@keyframes glow {
-    0% { box-shadow: 0 0 5px #00ffff; }
-    50% { box-shadow: 0 0 25px #00ff99; }
-    100% { box-shadow: 0 0 5px #00ffff; }
+/* Button glow */
+@keyframes browseGlow {
+    0% { box-shadow: 0 0 8px #8e2de2; }
+    100% { box-shadow: 0 0 25px #ff0080; }
 }
 
-/* Button pulse animation */
-@keyframes pulse {
-    0% { box-shadow: 0 0 5px #00ffff; }
-    50% { box-shadow: 0 0 25px #00ff99; }
-    100% { box-shadow: 0 0 5px #00ffff; }
+/* Hover zoom */
+div[data-testid="stFileUploaderDropzone"] button:hover {
+    transform: scale(1.08);
+    box-shadow: 0 0 35px #ff0080 !important;
 }
 
+/* Shine sweep */
+div[data-testid="stFileUploaderDropzone"] button::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -75%;
+    width: 50%;
+    height: 100%;
+    background: rgba(255,255,255,0.4);
+    transform: skewX(-25deg);
+    transition: 0.75s;
+}
+
+div[data-testid="stFileUploaderDropzone"] button:hover::after {
+    left: 125%;
+}
+
+/* Run scan button */
 .stButton > button {
     background: linear-gradient(90deg, #00ffff, #00ff99) !important;
     color: black !important;
     font-weight: bold !important;
     border-radius: 12px !important;
     padding: 10px 25px !important;
-    animation: pulse 2s infinite;
-    transition: 0.3s ease;
+    animation: glowPulse 2s infinite alternate;
 }
 
-.stButton > button:hover {
-    transform: scale(1.05);
-}
-
-/* Code block */
+/* Code blocks */
 pre {
     background: #0d1117 !important;
     color: white !important;
     border-radius: 12px;
 }
 
-/* Inline code */
 code {
     background: #1f2937 !important;
     color: #00ff99 !important;
@@ -187,7 +209,6 @@ if st.button("🔍 Run Full Security Scan"):
         st.warning("⚠ Please upload a Dockerfile first.")
     else:
 
-        # Scanning animation
         progress = st.progress(0)
         for i in range(100):
             time.sleep(0.01)
