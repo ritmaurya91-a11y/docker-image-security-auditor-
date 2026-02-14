@@ -187,4 +187,3 @@ if st.button("🔍 Run Full Security Scan"):
 
         st.divider()
         st.caption("Docker Image Security Auditor | AI Powered by Groq")
-
