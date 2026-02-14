@@ -15,77 +15,101 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 st.markdown("""
 <style>
 
-/* Background stays */
+/* Hide default Streamlit menu */
+#MainMenu, header, footer {visibility: hidden;}
+
+/* Background */
 .stApp {
     background:
-    linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.92)),
+    linear-gradient(rgba(0,0,0,0.92), rgba(0,0,0,0.96)),
     url("https://images.unsplash.com/photo-1518770660439-4636190af475");
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
 }
 
-/* ================================
-   ANIMATED DROPZONE DESIGN
-================================ */
+/* Force ALL text solid white */
+html, body, p, span, div, li, ul, ol,
+h1, h2, h3, h4, h5, h6,
+label, strong, em,
+[data-testid="stMarkdownContainer"] {
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
 
+/* ==============================
+   FIX DRAG & DROP TEXT
+============================== */
 div[data-testid="stFileUploaderDropzone"] {
-    background: rgba(25,25,25,0.95) !important;
-    border: 2px solid transparent !important;
-    border-radius: 20px !important;
-    padding: 50px !important;
-    position: relative;
-    transition: all 0.3s ease-in-out;
-    animation: glowPulse 3s infinite alternate;
+    background: rgba(20,20,20,0.95) !important;
+    border: 2px dashed #00ffff !important;
+    border-radius: 18px !important;
+    padding: 45px !important;
+    animation: glow 2s infinite;
+    transition: 0.3s ease;
 }
 
-/* Gradient glowing border */
-div[data-testid="stFileUploaderDropzone"]::before {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: 22px;
-    background: linear-gradient(45deg, #00ffff, #00ff99, #00ffff);
-    z-index: -1;
-    filter: blur(12px);
-    opacity: 0.6;
-}
-
-/* Hover animation */
 div[data-testid="stFileUploaderDropzone"]:hover {
     transform: scale(1.02);
-    box-shadow: 0 0 30px #00ff99;
+    border-color: #00ff99 !important;
 }
 
-/* Pulse glow animation */
-@keyframes glowPulse {
-    0% {
-        box-shadow: 0 0 10px #00ffff;
-    }
-    100% {
-        box-shadow: 0 0 25px #00ff99;
-    }
-}
-
-/* Drag text styling */
-div[data-testid="stFileUploaderDropzone"] p {
-    color: white !important;
-    font-weight: 600 !important;
+/* Main drag text */
+div[data-testid="stFileUploaderDropzone"] span {
+    color: #ffffff !important;
     font-size: 18px !important;
+    font-weight: 700 !important;
+    opacity: 1 !important;
 }
 
-/* Browse button styling */
-div[data-testid="stFileUploaderDropzone"] button {
+/* Sub text (limit file size) */
+div[data-testid="stFileUploaderDropzone"] small {
+    color: #ffffff !important;
+    font-size: 14px !important;
+    opacity: 1 !important;
+}
+
+/* Glow animation */
+@keyframes glow {
+    0% { box-shadow: 0 0 5px #00ffff; }
+    50% { box-shadow: 0 0 25px #00ff99; }
+    100% { box-shadow: 0 0 5px #00ffff; }
+}
+
+/* Button pulse animation */
+@keyframes pulse {
+    0% { box-shadow: 0 0 5px #00ffff; }
+    50% { box-shadow: 0 0 25px #00ff99; }
+    100% { box-shadow: 0 0 5px #00ffff; }
+}
+
+.stButton > button {
     background: linear-gradient(90deg, #00ffff, #00ff99) !important;
     color: black !important;
     font-weight: bold !important;
     border-radius: 12px !important;
+    padding: 10px 25px !important;
+    animation: pulse 2s infinite;
     transition: 0.3s ease;
 }
 
-div[data-testid="stFileUploaderDropzone"] button:hover {
+.stButton > button:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 15px #00ff99;
+}
+
+/* Code block */
+pre {
+    background: #0d1117 !important;
+    color: white !important;
+    border-radius: 12px;
+}
+
+/* Inline code */
+code {
+    background: #1f2937 !important;
+    color: #00ff99 !important;
+    padding: 3px 6px;
+    border-radius: 6px;
 }
 
 </style>
