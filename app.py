@@ -15,19 +15,38 @@ client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 st.markdown("""
 <style>
 
-/* Make only drag text black */
+/* Keep Background Image */
+.stApp {
+    background:
+    linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.90)),
+    url("https://images.unsplash.com/photo-1518770660439-4636190af475");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* Do NOT override whole page text */
+html, body {
+    color: white;
+}
+
+/* =========================
+   ONLY CHANGE UPLOADER TEXT
+========================= */
+
+/* Drag and drop text → BLACK */
 div[data-testid="stFileUploaderDropzone"] p {
     color: #000000 !important;
     font-weight: 600 !important;
 }
 
-/* Make Browse files button text black */
+/* Browse files button text → BLACK */
 div[data-testid="stFileUploaderDropzone"] button {
     color: #000000 !important;
     font-weight: 600 !important;
 }
 
-/* Optional: Make upload icon black too */
+/* Upload icon → BLACK */
 div[data-testid="stFileUploaderDropzone"] svg {
     fill: #000000 !important;
 }
