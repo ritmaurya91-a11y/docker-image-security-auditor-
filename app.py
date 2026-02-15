@@ -8,6 +8,13 @@ import re
 # ==============================
 st.set_page_config(page_title="Docker Security Auditor", layout="wide")
 
+# ==============================
+# GROQ CLIENT
+# ==============================
+if "GROQ_API_KEY" not in st.secrets:
+    st.error("❌ GROQ_API_KEY not found in secrets.")
+    st.stop()
+
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # ==============================
@@ -61,7 +68,7 @@ div[data-testid="stFileUploaderDropzone"] * {
 # HEADER
 # ==============================
 st.markdown("<h1 style='text-align:center;color:#00ffff;'>🐳 Docker Image Security Auditor</h1>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align:center;'>Static + AI Powered Scanner</h4>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center;'>Static + AI Powered Dockerfile Scanner</h4>", unsafe_allow_html=True)
 
 # ==============================
 # FILE UPLOAD
@@ -72,12 +79,12 @@ dockerfile_content = ""
 
 if uploaded_file:
     dockerfile_content = uploaded_file.read().decode("utf-8")
-    st.session_state.clear()
+    st.session_state["dockerfile"] = dockerfile_content
     st.subheader("📄 Uploaded Dockerfile")
     st.code(dockerfile_content, language="dockerfile")
 
 # ==============================
-# STRONG STATIC SCAN
+# STATIC SCAN
 # ==============================
 def static_scan(dockerfile):
 
@@ -96,12 +103,12 @@ def static_scan(dockerfile):
         checks.append(("Non-root user defined", "PASS"))
 
     if re.search(r"ENV\s+.*(PASSWORD|SECRET|KEY)", dockerfile, re.IGNORECASE):
-        checks.append(("Hardcoded secrets", "CRITICAL"))
+        checks.append(("Hardcoded secrets detected", "CRITICAL"))
     else:
         checks.append(("No hardcoded secrets", "PASS"))
 
     if "curl" in dockerfile and "| bash" in dockerfile:
-        checks.append(("Remote script execution", "CRITICAL"))
+        checks.append(("Remote script execution (curl | bash)", "CRITICAL"))
     else:
         checks.append(("No remote script execution", "PASS"))
 
@@ -122,12 +129,11 @@ def static_scan(dockerfile):
 
     return checks
 
+
 # ==============================
-# AI ANALYSIS (Groq)
+# AI ANALYSIS
 # ==============================
 def ai_analysis(dockerfile):
-
-    dockerfile = dockerfile[:4000]
 
     prompt = f"""
 You are a Senior DevSecOps Engineer.
@@ -140,49 +146,58 @@ Analyze this Dockerfile and provide:
 5. Best Practices
 
 Dockerfile:
-{dockerfile}
+{dockerfile[:4000]}
 """
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama3-70b-8192",
             messages=[
                 {"role": "system", "content": "You are a Docker security expert."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.3,
-            max_tokens=1000
+            max_tokens=1000,
+            timeout=30
         )
+
         return response.choices[0].message.content
+
     except Exception as e:
-        return f"❌ AI Error: {str(e)}"
+        return f"❌ AI Analysis Failed: {str(e)}"
+
 
 # ==============================
-# AUTO FIX (Groq)
+# AUTO FIX
 # ==============================
 def auto_fix(dockerfile):
 
     prompt = f"""
-Fix all security issues in this Dockerfile.
-Return ONLY the improved secure Dockerfile.
+Fix ALL security issues in this Dockerfile.
+Return ONLY the improved secure Dockerfile code.
+Do not add explanation.
 
 Dockerfile:
-{dockerfile}
+{dockerfile[:4000]}
 """
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="llama3-70b-8192",
             messages=[
                 {"role": "system", "content": "You are a Docker security expert."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.2,
-            max_tokens=1000
+            max_tokens=1500,
+            timeout=30
         )
-        return response.choices[0].message.content
+
+        return response.choices[0].message.content.strip()
+
     except Exception as e:
-        return f"❌ AutoFix Error: {str(e)}"
+        return f"❌ AutoFix Failed: {str(e)}"
+
 
 # ==============================
 # RUN SCAN
@@ -224,7 +239,6 @@ if st.button("🔍 Run Full Security Scan"):
 
         st.markdown(ai_text)
 
-        st.session_state["dockerfile"] = dockerfile_content
 
 # ==============================
 # AUTO FIX SECTION
@@ -237,8 +251,11 @@ if "dockerfile" in st.session_state:
         with st.spinner("Generating secure version..."):
             secure = auto_fix(st.session_state["dockerfile"])
 
-        st.success("✅ Secure Dockerfile Generated")
-        st.code(secure, language="dockerfile")
+        if secure.startswith("❌"):
+            st.error(secure)
+        else:
+            st.success("✅ Secure Dockerfile Generated")
+            st.code(secure, language="dockerfile")
 
     st.divider()
     st.caption("Enterprise Docker Security Auditor | Powered by Groq AI")
