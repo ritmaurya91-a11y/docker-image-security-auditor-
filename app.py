@@ -11,7 +11,7 @@ st.set_page_config(page_title="Docker Security Auditor", layout="wide")
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # ==============================
-# PERFECT DARK CSS FIX
+# DARK UI FIX
 # ==============================
 st.markdown("""
 <style>
@@ -26,19 +26,16 @@ st.markdown("""
     background-attachment: fixed;
 }
 
-/* FORCE ALL TEXT WHITE */
 html, body, p, span, div, label, li, ul, ol, h1, h2, h3, h4 {
     color: #ffffff !important;
 }
 
-/* FIX CODE BLOCK VISIBILITY */
 pre, code {
     background-color: #111111 !important;
     color: #00ff99 !important;
     border-radius: 12px !important;
 }
 
-/* FIX FILE UPLOADER TEXT */
 div[data-testid="stFileUploaderDropzone"] {
     background: #111111 !important;
     border: 2px dashed #00ffff !important;
@@ -50,7 +47,6 @@ div[data-testid="stFileUploaderDropzone"] * {
     color: #ffffff !important;
 }
 
-/* BUTTON STYLE */
 .stButton > button {
     background: linear-gradient(90deg, #00ffff, #00ff99) !important;
     color: black !important;
@@ -58,20 +54,14 @@ div[data-testid="stFileUploaderDropzone"] * {
     border-radius: 12px !important;
     padding: 10px 25px !important;
 }
-
-/* HEADER */
-h1 {
-    text-align: center;
-    color: #00ffff !important;
-}
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================
 # HEADER
 # ==============================
-st.markdown("<h1>🐳 Docker Image Security Auditor</h1>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align:center;'>Static + AI Powered Dockerfile Scanner</h4>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center;color:#00ffff;'>🐳 Docker Image Security Auditor</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center;'>Static + AI Powered Scanner</h4>", unsafe_allow_html=True)
 
 # ==============================
 # FILE UPLOAD
@@ -82,10 +72,7 @@ dockerfile_content = ""
 
 if uploaded_file:
     dockerfile_content = uploaded_file.read().decode("utf-8")
-
-    # Clear old session
     st.session_state.clear()
-
     st.subheader("📄 Uploaded Dockerfile")
     st.code(dockerfile_content, language="dockerfile")
 
@@ -135,6 +122,67 @@ def static_scan(dockerfile):
 
     return checks
 
+# ==============================
+# AI ANALYSIS (Groq)
+# ==============================
+def ai_analysis(dockerfile):
+
+    dockerfile = dockerfile[:4000]
+
+    prompt = f"""
+You are a Senior DevSecOps Engineer.
+
+Analyze this Dockerfile and provide:
+1. Overall Risk Percentage
+2. Security Risks
+3. Explanation
+4. Recommended Fixes
+5. Best Practices
+
+Dockerfile:
+{dockerfile}
+"""
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are a Docker security expert."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.3,
+            max_tokens=1000
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"❌ AI Error: {str(e)}"
+
+# ==============================
+# AUTO FIX (Groq)
+# ==============================
+def auto_fix(dockerfile):
+
+    prompt = f"""
+Fix all security issues in this Dockerfile.
+Return ONLY the improved secure Dockerfile.
+
+Dockerfile:
+{dockerfile}
+"""
+
+    try:
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {"role": "system", "content": "You are a Docker security expert."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.2,
+            max_tokens=1000
+        )
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"❌ AutoFix Error: {str(e)}"
 
 # ==============================
 # RUN SCAN
@@ -170,19 +218,27 @@ if st.button("🔍 Run Full Security Scan"):
 
         st.divider()
 
+        st.subheader("🤖 AI Security Expert Review")
+        with st.spinner("Analyzing with Groq AI..."):
+            ai_text = ai_analysis(dockerfile_content)
+
+        st.markdown(ai_text)
+
         st.session_state["dockerfile"] = dockerfile_content
 
-
 # ==============================
-# AUTO FIX
+# AUTO FIX SECTION
 # ==============================
 if "dockerfile" in st.session_state:
 
     st.subheader("🛠 Auto-Fix Dockerfile")
 
     if st.button("🚀 Generate Secure Dockerfile"):
-        st.success("✅ Auto-Fix Placeholder (AI can be added here)")
-        st.code("# Secure Dockerfile will appear here", language="dockerfile")
+        with st.spinner("Generating secure version..."):
+            secure = auto_fix(st.session_state["dockerfile"])
+
+        st.success("✅ Secure Dockerfile Generated")
+        st.code(secure, language="dockerfile")
 
     st.divider()
-    st.caption("Enterprise Docker Security Auditor")
+    st.caption("Enterprise Docker Security Auditor | Powered by Groq AI")
