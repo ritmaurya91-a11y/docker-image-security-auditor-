@@ -59,11 +59,11 @@ div[data-testid="stFileUploaderDropzone"] div {
 }
 
 div[data-testid="stFileUploaderDropzone"] button {
-    box-shadow: 0 0 15px #ff00ff;
+    box-shadow: 0 0 15px #FF6666;
 }
 
 .stButton > button {
-    background: linear-gradient(90deg, #00ffff, #00ff99) !important;
+    background: linear-gradient(90deg, #FF6666, #FF6666) !important;
     color: black !important;
     font-weight: bold !important;
     border-radius: 12px !important;
