@@ -18,7 +18,7 @@ if "GROQ_API_KEY" not in st.secrets:
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # ==============================
-# DARK UI + FULL GLOW ANIMATION
+# DARK UI + FULL VISIBILITY FIX
 # ==============================
 st.markdown("""
 <style>
@@ -33,30 +33,25 @@ st.markdown("""
     background-attachment: fixed;
 }
 
+/* Global Text */
 html, body, p, span, div, label, li, ul, ol, h1, h2, h3, h4 {
     color: #ffffff !important;
 }
 
+/* Code Blocks */
 pre, code {
     background-color: #111111 !important;
     color: #00ff99 !important;
     border-radius: 12px !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] {
-    background: #111111 !important;
-    border: 2px dashed #00ffff !important;
-    border-radius: 20px !important;
-    padding: 40px !important;
-}
-
 /* ==============================
    STRONG GLOW ANIMATION
 ============================== */
 @keyframes strongGlow {
-    0% { text-shadow: 0 0 10px #00ffff; }
-    50% { text-shadow: 0 0 40px #00ffff, 0 0 80px #00ff99; }
-    100% { text-shadow: 0 0 10px #00ffff; }
+    0% { text-shadow: 0 0 8px #00ffff; }
+    50% { text-shadow: 0 0 25px #00ffff, 0 0 50px #00ff99; }
+    100% { text-shadow: 0 0 8px #00ffff; }
 }
 
 /* Title */
@@ -69,24 +64,46 @@ h4 {
     animation: strongGlow 3s infinite ease-in-out;
 }
 
-/* Upload label */
+/* Upload Box Styling */
+div[data-testid="stFileUploaderDropzone"] {
+    background: rgba(0, 0, 0, 0.75) !important;
+    border: 2px dashed #00ffff !important;
+    border-radius: 20px !important;
+    padding: 40px !important;
+}
+
+/* Upload Label */
 div[data-testid="stFileUploader"] label {
     animation: strongGlow 2.5s infinite ease-in-out;
     font-weight: bold !important;
     color: #00ffff !important;
 }
 
-/* Drag & Drop text */
+/* Drag & Drop Text */
 div[data-testid="stFileUploaderDropzone"] span {
-    animation: strongGlow 3s infinite ease-in-out;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 18px !important;
+    text-shadow: 0 0 15px #00ffff, 0 0 25px #00ff99 !important;
+    opacity: 1 !important;
 }
 
-/* File limit text */
+/* File Limit Text */
 div[data-testid="stFileUploaderDropzone"] small {
-    animation: strongGlow 3.5s infinite ease-in-out;
-    color: #00ffcc !important;
+    color: #ffffff !important;
+    font-weight: 500 !important;
+    font-size: 14px !important;
+    text-shadow: 0 0 10px #00ffff !important;
+    opacity: 1 !important;
 }
 
+/* Selected File Name */
+div[data-testid="stFileUploader"] div {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Button */
 .stButton > button {
     background: linear-gradient(90deg, #00ffff, #00ff99) !important;
     color: black !important;
