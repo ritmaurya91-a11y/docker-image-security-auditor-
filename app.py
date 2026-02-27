@@ -18,7 +18,7 @@ if "GROQ_API_KEY" not in st.secrets:
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # ==============================
-# DARK UI FIX
+# DARK UI + ANIMATIONS
 # ==============================
 st.markdown("""
 <style>
@@ -50,20 +50,8 @@ div[data-testid="stFileUploaderDropzone"] {
     padding: 40px !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] * {
-    color: #ffffff !important;
-}
-
-.stButton > button {
-    background: linear-gradient(90deg, #00ffff, #00ff99) !important;
-    color: black !important;
-    font-weight: bold !important;
-    border-radius: 12px !important;
-    padding: 10px 25px !important;
-}
-
 /* ==============================
-   STRONG TITLE GLOW ANIMATION
+   TITLE GLOW ANIMATION
 ============================== */
 @keyframes strongGlow {
     0% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
@@ -73,6 +61,38 @@ div[data-testid="stFileUploaderDropzone"] * {
 
 h1 {
     animation: strongGlow 2s infinite ease-in-out;
+}
+
+/* ==============================
+   FILE UPLOADER TEXT ANIMATION
+============================== */
+@keyframes softPulse {
+    0% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.03); }
+    100% { opacity: 0.6; transform: scale(1); }
+}
+
+div[data-testid="stFileUploader"] label {
+    animation: softPulse 2s infinite ease-in-out;
+    font-weight: bold !important;
+    color: #00ffff !important;
+}
+
+div[data-testid="stFileUploaderDropzone"] {
+    animation: softPulse 3s infinite ease-in-out;
+}
+
+div[data-testid="stFileUploaderDropzone"] small {
+    animation: softPulse 4s infinite ease-in-out;
+    color: #00ffcc !important;
+}
+
+.stButton > button {
+    background: linear-gradient(90deg, #00ffff, #00ff99) !important;
+    color: black !important;
+    font-weight: bold !important;
+    border-radius: 12px !important;
+    padding: 10px 25px !important;
 }
 </style>
 """, unsafe_allow_html=True)
