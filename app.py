@@ -61,42 +61,28 @@ div[data-testid="stFileUploaderDropzone"] * {
     border-radius: 12px !important;
     padding: 10px 25px !important;
 }
+
+/* ==============================
+   STRONG TITLE GLOW ANIMATION
+============================== */
+@keyframes strongGlow {
+    0% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
+    50% { text-shadow: 0 0 40px #00ffff, 0 0 80px #00ff99, 0 0 120px #00ff99; }
+    100% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
+}
+
+h1 {
+    animation: strongGlow 2s infinite ease-in-out;
+}
 </style>
 """, unsafe_allow_html=True)
 
 # ==============================
+# HEADER
 # ==============================
-# ==============================
-# HEADER (Animated - No Text Change)
-# ==============================
-st.markdown("""
-<style>
-@keyframes glow {
-    0% { text-shadow: 0 0 5px #00ffff; }
-    50% { text-shadow: 0 0 25px #00ffff, 0 0 40px #00ff99; }
-    100% { text-shadow: 0 0 5px #00ffff; }
-}
+st.markdown("<h1 style='text-align:center;color:#00ffff;'>🐳 Docker Image Security Auditor</h1>", unsafe_allow_html=True)
+st.markdown("<h4 style='text-align:center;'>Static + AI Powered Dockerfile Scanner</h4>", unsafe_allow_html=True)
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.animated-h1 {
-    text-align:center;
-    color:#00ffff;
-    animation: glow 2s infinite ease-in-out, fadeIn 1.5s ease-in-out;
-}
-
-.animated-h4 {
-    text-align:center;
-    animation: fadeIn 2s ease-in-out;
-}
-</style>
-
-<h1 class="animated-h1">🐳 Docker Image Security Auditor</h1>
-<h4 class="animated-h4">Static + AI Powered Dockerfile Scanner</h4>
-""", unsafe_allow_html=True)
 # ==============================
 # FILE UPLOAD
 # ==============================
