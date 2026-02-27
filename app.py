@@ -18,7 +18,7 @@ if "GROQ_API_KEY" not in st.secrets:
 client = Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 # ==============================
-# DARK UI + ANIMATIONS
+# DARK UI + FULL GLOW ANIMATION
 # ==============================
 st.markdown("""
 <style>
@@ -51,39 +51,39 @@ div[data-testid="stFileUploaderDropzone"] {
 }
 
 /* ==============================
-   TITLE GLOW ANIMATION
+   STRONG GLOW ANIMATION
 ============================== */
 @keyframes strongGlow {
-    0% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
-    50% { text-shadow: 0 0 40px #00ffff, 0 0 80px #00ff99, 0 0 120px #00ff99; }
-    100% { text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; }
+    0% { text-shadow: 0 0 10px #00ffff; }
+    50% { text-shadow: 0 0 40px #00ffff, 0 0 80px #00ff99; }
+    100% { text-shadow: 0 0 10px #00ffff; }
 }
 
+/* Title */
 h1 {
     animation: strongGlow 2s infinite ease-in-out;
 }
 
-/* ==============================
-   FILE UPLOADER TEXT ANIMATION
-============================== */
-@keyframes softPulse {
-    0% { opacity: 0.6; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.03); }
-    100% { opacity: 0.6; transform: scale(1); }
+/* Subtitle */
+h4 {
+    animation: strongGlow 3s infinite ease-in-out;
 }
 
+/* Upload label */
 div[data-testid="stFileUploader"] label {
-    animation: softPulse 2s infinite ease-in-out;
+    animation: strongGlow 2.5s infinite ease-in-out;
     font-weight: bold !important;
     color: #00ffff !important;
 }
 
-div[data-testid="stFileUploaderDropzone"] {
-    animation: softPulse 3s infinite ease-in-out;
+/* Drag & Drop text */
+div[data-testid="stFileUploaderDropzone"] span {
+    animation: strongGlow 3s infinite ease-in-out;
 }
 
+/* File limit text */
 div[data-testid="stFileUploaderDropzone"] small {
-    animation: softPulse 4s infinite ease-in-out;
+    animation: strongGlow 3.5s infinite ease-in-out;
     color: #00ffcc !important;
 }
 
