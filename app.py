@@ -65,11 +65,43 @@ div[data-testid="stFileUploaderDropzone"] * {
 """, unsafe_allow_html=True)
 
 # ==============================
-# HEADER
 # ==============================
-st.markdown("<h1 style='text-align:center;color:#00ffff;'>🐳 Docker Image Security Auditor</h1>", unsafe_allow_html=True)
-st.markdown("<h4 style='text-align:center;'>Static + AI Powered Dockerfile Scanner</h4>", unsafe_allow_html=True)
+# ANIMATED TITLE & HEADING
+# ==============================
+st.markdown("""
+<style>
+@keyframes glow {
+    0% { text-shadow: 0 0 5px #00ffff; }
+    50% { text-shadow: 0 0 20px #00ffff, 0 0 30px #00ff99; }
+    100% { text-shadow: 0 0 5px #00ffff; }
+}
 
+@keyframes floatText {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
+.animated-title {
+    text-align: center;
+    font-size: 48px;
+    font-weight: bold;
+    color: #00ffff;
+    animation: glow 2s infinite ease-in-out, floatText 3s infinite ease-in-out;
+}
+
+.animated-subtitle {
+    text-align: center;
+    font-size: 20px;
+    color: #ffffff;
+    letter-spacing: 2px;
+    animation: floatText 4s infinite ease-in-out;
+}
+</style>
+
+<div class="animated-title">🐳 Docker Image Security Auditor</div>
+<div class="animated-subtitle">Static + AI Powered Dockerfile Scanner</div>
+""", unsafe_allow_html=True)
 # ==============================
 # FILE UPLOAD
 # ==============================
